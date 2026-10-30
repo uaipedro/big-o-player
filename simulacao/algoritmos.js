@@ -290,6 +290,171 @@
     };
   }
 
+  // ---------- FIGS (como algoritmos/figs/figs.py, o figs() do figsr) ----------
+  // várias árvores crescem juntas; a cada passo, cada folha e a raiz de uma árvore nova
+  // procuram o corte que mais reduz a soma dos quadrados dos resíduos, e o melhor entra
+
+  const FIGS = { minN: 5, maxCortes: 30, tolerancia: 1e-10, ganhoMinimo: 1e-6 };
+  const bate = (g, atual) => atual === -Infinity || g > atual + FIGS.tolerancia * Math.abs(atual);
+  function mediaR(v) {   // duas passadas, como o mean() do R
+    let s = 0;
+    for (const x of v) s += x;
+    const m = s / v.length;
+    let t = 0;
+    for (const x of v) t += x - m;
+    return m + t / v.length;
+  }
+  function quantis7(xs, probs) {   // quantile(type = 7) com xs em ordem
+    const n = xs.length;
+    return probs.map((p) => {
+      const ind = 1 + Math.max(n - 1, 0) * p, lo = Math.floor(ind), hi = Math.ceil(ind);
+      let q = xs[lo - 1];
+      if (ind > lo && xs[hi - 1] !== q) { const h = ind - lo; q = (1 - h) * q + h * xs[hi - 1]; }
+      return q;
+    });
+  }
+  const direitaDe = (xs, c) => { let lo = 0, hi = xs.length; while (lo < hi) { const m = (lo + hi) >> 1; if (xs[m] <= c) lo = m + 1; else hi = m; } return lo; };
+  function cortesDe(xs) {
+    const vals = [xs[0]];
+    for (let i = 1; i < xs.length; i++) if (xs[i] !== xs[i - 1]) vals.push(xs[i]);
+    if (vals.length <= 1) return null;
+    let cs = vals.slice(0, -1).map((v, i) => (v + vals[i + 1]) / 2);
+    if (cs.length > FIGS.maxCortes) {
+      const n1 = FIGS.maxCortes - 1, passo = (0.95 - 0.05) / n1;
+      const probs = [0.05, ...Array.from({ length: n1 - 1 }, (_, i) => 0.05 + (i + 1) * passo), 0.95];
+      cs = [...new Set(quantis7(xs, probs))];
+    }
+    return cs.map((c) => [c, direitaDe(xs, c)]);
+  }
+  function candidataFigs(X, linhas, arvore, no, ordemMae) {
+    const d = X[0].length, n = linhas.length;
+    let ordem;
+    if (!ordemMae) ordem = Array.from({ length: d }, (_, j) => linhas.slice().sort((a, b) => X[a][j] - X[b][j]));
+    else { const dentro = new Set(linhas); ordem = ordemMae.map((o) => o.filter((i) => dentro.has(i))); }
+    const variaveis = [], cortes = [];
+    for (let j = 0; j < d; j++) {
+      const cs = n >= 2 * FIGS.minN ? cortesDe(ordem[j].map((i) => X[i][j])) : null;
+      if (cs) { variaveis.push(j); cortes.push(cs.filter(([, e]) => e >= FIGS.minN && n - e >= FIGS.minN)); }
+    }
+    return { arvore, no, linhas, ordem, variaveis, cortes, suja: true, ganho: -Infinity, corte: null };
+  }
+  const noFigs = (id, valor, n) => ({ id, folha: true, valor, n, variavel: null, corte: null, esq: null, dir: null });
+  function preverFigs(arvores, x) {
+    let total = 0;
+    for (const a of arvores) {
+      let p = a[0];
+      while (!p.folha) p = a[(x[p.variavel] <= p.corte ? p.esq : p.dir) - 1];
+      total += p.valor;
+    }
+    return total;
+  }
+  const classeFigs = (p) => (Math.min(Math.max(p, 1e-6), 1 - 1e-6) >= 0.5 ? 1 : 0);
+  const copiaArvores = (arvores) => arvores.map((a) => a.map((q) => ({ ...q })));
+
+  /** FIGS em X (n × d), y em 0/1, até s divisões; maxArvores = 1 é a árvore única. */
+  function figs(X, y, s, maxArvores = null) {
+    const c = contador(), n = y.length, d = X[0].length;
+    const nomeC = (o) => (o.arvore === 0 ? "raiz nova" : `árvore ${o.arvore}, nó ${o.no}`);
+    const V = c.vars = { passo: null, c: null, j: null, i: null, soma: null, ganho: null, "c.ganho": null, maior: null };
+    const residuos = y.map(Number);
+    c.aloca("residuos", n);
+    const arvores = [];
+    const candidatas = [candidataFigs(X, Array.from({ length: n }, (_, i) => i), 0, 1)];
+    c.aloca("ordens", d * n);
+    c.push({ t: "atribui", linha: 2, residuos: residuos.slice() });
+    c.push({ t: "atribui", linha: 3 });
+    let somas = 0, cortes = 0, divisoes = 0;
+    for (let passo = 0; passo < s; passo++) {
+      let melhor = null, ganho = -Infinity;
+      Object.assign(V, { passo: passo + 1, c: null, j: null, i: null, soma: null, ganho: null, "c.ganho": null, maior: null });
+      c.push({ t: "atribui", linha: 5 });
+      for (const o of candidatas) {
+        Object.assign(V, { c: nomeC(o), j: null, i: null, soma: null, ganho: null, "c.ganho": o.ganho === -Infinity ? null : o.ganho });
+        c.push({ t: "testa", linha: 7, c: o.arvore, no: o.no, suja: o.suja });
+        if (o.suja) {
+          o.suja = false; o.ganho = -Infinity; o.corte = null;
+          const m = mediaR(o.linhas.map((i) => residuos[i]));
+          V["c.ganho"] = null;
+          c.push({ t: "atribui", linha: 8, c: o.arvore, no: o.no });
+          o.variaveis.forEach((j, q) => {
+            const S = [0];
+            let soma = 0;
+            Object.assign(V, { j: j + 1, i: null, soma: 0, ganho: null });
+            c.push({ t: "atribui", linha: 10, c: o.arvore, no: o.no, j });
+            for (const i of o.ordem[j]) {
+              c.op("somas"); somas++;
+              soma += residuos[i] - m;
+              S.push(soma);
+              Object.assign(V, { i: i + 1, soma });
+              c.push({ t: "soma", linha: 12, c: o.arvore, no: o.no, j, i, k: S.length - 1, soma });
+            }
+            c.aloca("somas", S.length);
+            V.i = null;
+            for (const [corte, e] of o.cortes[q]) {
+              c.op("cortes"); cortes++;
+              const g = S[e] ** 2 / e + (soma - S[e]) ** 2 / (S.length - 1 - e) - soma ** 2 / (S.length - 1);
+              V.ganho = g;
+              c.push({ t: "ganho", linha: 14, c: o.arvore, no: o.no, j, corte, e, g });
+              c.push({ t: "compara", linha: 15, c: o.arvore, no: o.no, j, corte });
+              if (bate(g, o.ganho)) {
+                o.ganho = g; o.corte = [j, corte];
+                V["c.ganho"] = g;
+                c.push({ t: "atribui", linha: 16, c: o.arvore, no: o.no, j, corte, g });
+              }
+            }
+          });
+        }
+        c.push({ t: "compara", linha: 17, c: o.arvore, no: o.no });
+        if (bate(o.ganho, ganho)) {
+          melhor = o; ganho = o.ganho;
+          V.maior = ganho === -Infinity ? null : ganho;
+          c.push({ t: "atribui", linha: 18, c: o.arvore, no: o.no });
+        }
+      }
+      Object.assign(V, { c: melhor && ganho > -Infinity ? nomeC(melhor) : null, j: null, i: null, soma: null, ganho: null });
+      c.push({ t: "testa", linha: 19 });
+      if (ganho <= FIGS.ganhoMinimo) { c.push({ t: "pare", linha: 20 }); break; }
+      // dividir (algoritmos/figs/figs.py:dividir)
+      const [j, corte] = melhor.corte;
+      const esq = melhor.linhas.filter((i) => X[i][j] <= corte), dir = melhor.linhas.filter((i) => X[i][j] > corte);
+      const me = mediaR(esq.map((i) => residuos[i])), md = mediaR(dir.map((i) => residuos[i]));
+      let t, mae;
+      if (melhor.arvore === 0) {
+        arvores.push([noFigs(1, 0, melhor.linhas.length), noFigs(2, me, esq.length), noFigs(3, md, dir.length)]);
+        t = arvores.length; mae = 1;
+      } else {
+        t = melhor.arvore; mae = melhor.no;
+        const a = arvores[t - 1], base = a[mae - 1].valor;
+        a.push(noFigs(a.length + 1, base + me, esq.length));
+        a.push(noFigs(a.length + 1, base + md, dir.length));
+        candidatas.splice(candidatas.indexOf(melhor), 1);
+      }
+      const pai = arvores[t - 1][mae - 1];
+      Object.assign(pai, { folha: false, variavel: j, corte, esq: arvores[t - 1].length - 1, dir: arvores[t - 1].length, ganho });
+      divisoes++;
+      c.push({ t: "divide", linha: 21, arvore: t, no: mae, j, corte, arvores: copiaArvores(arvores) });
+      for (const i of esq) residuos[i] -= me;
+      for (const i of dir) residuos[i] -= md;
+      c.push({ t: "residuos", linha: 23, residuos: residuos.slice(), arvore: t, no: mae });
+      const mudou = new Set(melhor.linhas);
+      for (const o of candidatas) if (o.arvore === 0 || o.linhas.some((i) => mudou.has(i))) o.suja = true;
+      const novas = [candidataFigs(X, esq, t, pai.esq, melhor.ordem), candidataFigs(X, dir, t, pai.dir, melhor.ordem)];
+      const raiz = candidatas[0], folhas = candidatas.slice(1).concat(novas);
+      if (maxArvores !== null && arvores.length >= maxArvores) { raiz.suja = false; raiz.ganho = -Infinity; raiz.corte = null; raiz.variaveis = []; }
+      folhas.sort((p, q) => p.arvore - q.arvore || p.no - q.no);
+      candidatas.splice(0, candidatas.length, raiz, ...folhas);
+      c.aloca("ordens", candidatas.reduce((sm, o) => sm + o.ordem.length * o.linhas.length, 0));
+      c.aloca("arvores", 3 * arvores.reduce((sm, a) => sm + a.length, 0));
+      c.push({ t: "marca", linha: 24 });
+    }
+    c.push({ t: "devolva", linha: 25 });
+    const previsoes = X.map((x) => preverFigs(arvores, x));
+    return {
+      eventos: c.eventos, arvores, previsoes, acertos: previsoes.filter((p, i) => classeFigs(p) === y[i]).length, divisoes,
+      somas: c.ops.somas || 0, cortes: c.ops.cortes || 0, pico: c.pico, detalhe: c.detalhe,
+    };
+  }
+
   // ---------- buscas (motor/busca.py) ----------
   // o vetor guarda pares; cada comparação de uma casa com o alvo conta 1
 
@@ -1566,7 +1731,7 @@
     return { texto: base(n), padrao: base(m) };
   }
 
-  const api = { ordenar, kmeans, buscar, parenteses, atendimento, inverter, janela, janelaIngenua, percursos, buscaArvore, avl, valoresArvore, largura, profundidade, mediana, welford, somaDosQuadrados, duasPassadas,
+  const api = { ordenar, kmeans, figs, preverFigs, classeFigs, buscar, parenteses, atendimento, inverter, janela, janelaIngenua, percursos, buscaArvore, avl, valoresArvore, largura, profundidade, mediana, welford, somaDosQuadrados, duasPassadas,
     histograma, pretty, sturges, prioridade, dijkstra, entrada, valoresSorteados, entradaBusca, textoParenteses, clientes, pacientes, grafoGrade, pesosGrade,
     centrosIniciais, amostra, palavras, repetidos, repetidosVetor, encadeamento, sondagem, valoresRepetidos, chavesColisao, ORDENACOES,
     maximo, multiplicacao, fatorial, fibRecursivo, fibMemoria, fibIterativo, padrao, matrizesSorteadas, textoPadrao };

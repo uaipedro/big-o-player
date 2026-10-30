@@ -26456,6 +26456,1461 @@ window.GALERIA = [
     20
    ]
   }
+ },
+ {
+  "ciclomatica": {
+   "porque": "Cada for, while e if, e cada and/or numa condição, abre um caminho a mais pelo código. A complexidade ciclomática conta os caminhos independentes: qualquer percurso pela função é uma combinação deles. É um teto para quantos testes cobrem todos os ramos, não o mínimo.",
+   "regra": "Regra de contagem: +1 por for, while, if, if-expressão, except e cada and/or. Compreensões de lista são proibidas na função medida, porque escondem um laço que o grafo não veria."
+  },
+  "alg": "figs",
+  "id": "figs",
+  "nome": "FIGS",
+  "objetivo": "Decidir a classe somando várias árvores pequenas, que dá pra ler de olho.",
+  "variante": "como o figs() do pacote figsr: duas classes, min_n = 5",
+  "familia": "classificação",
+  "resumo": "Em vez de uma árvore funda, várias rasas que crescem juntas. Cada exemplo começa com o erro inteiro: 1 se é da segunda classe, 0 se não é. A cada passo, toda folha de toda árvore, e a raiz de uma árvore nova, procura o corte que mais diminui esse erro, e só o melhor de todos entra. A previsão é a soma de uma folha de cada árvore: o que uma não explicou, a outra explica. Com poucas divisões, o modelo inteiro cabe numa olhada.",
+  "instrumentos": [
+   {
+    "id": "arvore",
+    "papel": "as árvores somadas: cada nó guarda a variável e o corte, e cada folha o valor que entra na soma"
+   },
+   {
+    "id": "vetor",
+    "papel": "os resíduos, um por exemplo: o erro que ainda falta explicar"
+   }
+  ],
+  "tempo": {
+   "notacao": "O(s·t·d·n)",
+   "porque": "Procurar o corte de uma candidata é passar pelos exemplos dela em ordem, uma vez por variável, somando os resíduos: d somas por exemplo. A raiz de uma árvore nova tem os n exemplos e volta à disputa em todo passo, e as folhas de uma mesma árvore dividem os n exemplos entre si. Com s passos e t árvores, nunca passa de s·(t + 1)·d·n somas.",
+   "nota": "A ordem dos exemplos por variável é montada uma vez, quando a candidata nasce, e a filha herda a ordem da mãe sem ordenar de novo. Folha cujos resíduos não mudaram guarda o melhor corte da última busca e não é varrida outra vez: na árvore única, cada passo varre só as duas folhas novas. Com mais de 30 cortes possíveis numa variável, o figsr testa só 30, nos quantis: os cortes testados param de crescer com n, as somas não."
+  },
+  "memoria": {
+   "notacao": "O(t·d·n)",
+   "porque": "Um resíduo por exemplo e, em cada candidata, os exemplos dela em ordem, uma lista por variável. As folhas de uma árvore dividem os n exemplos, então cada árvore guarda d·n, e a raiz nova guarda outros d·n. As árvores em si são poucas casas: variável, corte e valor de cada nó.",
+   "nomes": {
+    "residuos": "resíduos (um por exemplo)",
+    "ordens": "os exemplos de cada candidata, em ordem, por variável",
+    "somas": "as somas da varredura da vez",
+    "arvores": "nós das árvores (variável, corte e valor)"
+   },
+   "cresce_com_n": [
+    "residuos",
+    "ordens",
+    "somas"
+   ],
+   "vazados": "crescem com o número de nós"
+  },
+  "video": {
+   "ideia": [
+    "cada folha, e a raiz de uma árvore nova, testa os seus cortes",
+    "entra o corte que mais diminui o erro; a previsão é a soma das árvores"
+   ]
+  },
+  "graficos": {
+   "titulo": "Tempo: quanto custa abrir árvore nova",
+   "texto": "As mesmas contas para cada vez mais exemplos e cada vez mais divisões, no FIGS e na árvore única. Em escala logarítmica, quem cresce como n sobe em linha reta, com inclinação 1.",
+   "crescimento": "Resíduos somados para n de {n0} a {n1}, com s = {k}. {dados}; a faixa cinza vai do menor ao maior sorteio do FIGS. Os dois sobem retos: dobrou os exemplos, dobra a conta.",
+   "por_k": "Resíduos somados para s de {k0} a {k1} divisões, com n = {nk}. O FIGS paga a raiz de uma árvore nova em todo passo e sobe reto com s; a árvore única só varre as duas folhas novas, que vão ficando menores, e quase deita.",
+   "memoria": "Memória no pico para s de {k0} a {k1} divisões, com n = {nk} (o maior entre os sorteios). Cada árvore nova guarda de novo os n exemplos em ordem; a árvore única guarda sempre uma árvore e a raiz."
+  },
+  "placa": {
+   "autor": "Yan Shuo Tan, Chandan Singh, Keyan Nasseri, Abhineet Agarwal, James Duncan, Omer Ronen, Matthew Epland, Aaron Kornblith e Bin Yu",
+   "ano": "2022 (arXiv); no PNAS, doi:10.1073/pnas.2310151122"
+  },
+  "poster": "algoritmos/figs/figs.png",
+  "exemplo": {
+   "dados": "mtcars (R): o câmbio de 32 carros pelo peso (mil libras) e pela potência (hp)",
+   "n": 32,
+   "d": 2,
+   "s": 5,
+   "k": 5,
+   "variaveis": [
+    "peso",
+    "potência"
+   ],
+   "classes": [
+    "automático",
+    "manual"
+   ],
+   "carros": [
+    "Mazda RX4",
+    "Mazda RX4 Wag",
+    "Datsun 710",
+    "Hornet 4 Drive",
+    "Hornet Sportabout",
+    "Valiant",
+    "Duster 360",
+    "Merc 240D",
+    "Merc 230",
+    "Merc 280",
+    "Merc 280C",
+    "Merc 450SE",
+    "Merc 450SL",
+    "Merc 450SLC",
+    "Cadillac Fleetwood",
+    "Lincoln Continental",
+    "Chrysler Imperial",
+    "Fiat 128",
+    "Honda Civic",
+    "Toyota Corolla",
+    "Toyota Corona",
+    "Dodge Challenger",
+    "AMC Javelin",
+    "Camaro Z28",
+    "Pontiac Firebird",
+    "Fiat X1-9",
+    "Porsche 914-2",
+    "Lotus Europa",
+    "Ford Pantera L",
+    "Ferrari Dino",
+    "Maserati Bora",
+    "Volvo 142E"
+   ],
+   "X": [
+    [
+     2.62,
+     110.0
+    ],
+    [
+     2.875,
+     110.0
+    ],
+    [
+     2.32,
+     93.0
+    ],
+    [
+     3.215,
+     110.0
+    ],
+    [
+     3.44,
+     175.0
+    ],
+    [
+     3.46,
+     105.0
+    ],
+    [
+     3.57,
+     245.0
+    ],
+    [
+     3.19,
+     62.0
+    ],
+    [
+     3.15,
+     95.0
+    ],
+    [
+     3.44,
+     123.0
+    ],
+    [
+     3.44,
+     123.0
+    ],
+    [
+     4.07,
+     180.0
+    ],
+    [
+     3.73,
+     180.0
+    ],
+    [
+     3.78,
+     180.0
+    ],
+    [
+     5.25,
+     205.0
+    ],
+    [
+     5.424,
+     215.0
+    ],
+    [
+     5.345,
+     230.0
+    ],
+    [
+     2.2,
+     66.0
+    ],
+    [
+     1.615,
+     52.0
+    ],
+    [
+     1.835,
+     65.0
+    ],
+    [
+     2.465,
+     97.0
+    ],
+    [
+     3.52,
+     150.0
+    ],
+    [
+     3.435,
+     150.0
+    ],
+    [
+     3.84,
+     245.0
+    ],
+    [
+     3.845,
+     175.0
+    ],
+    [
+     1.935,
+     66.0
+    ],
+    [
+     2.14,
+     91.0
+    ],
+    [
+     1.513,
+     113.0
+    ],
+    [
+     3.17,
+     264.0
+    ],
+    [
+     2.77,
+     175.0
+    ],
+    [
+     3.57,
+     335.0
+    ],
+    [
+     2.78,
+     109.0
+    ]
+   ],
+   "y": [
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "min_n": 5,
+   "media_y": 0.40625,
+   "erro_inicial": 13,
+   "arvores": [
+    [
+     {
+      "id": 1,
+      "folha": false,
+      "valor": 0.0,
+      "n": 32,
+      "variavel": 0,
+      "corte": 3.1799999999999997,
+      "esq": 2,
+      "dir": 3,
+      "ganho": 5.060019841269841
+     },
+     {
+      "id": 2,
+      "folha": false,
+      "valor": 0.8571428571428571,
+      "n": 14,
+      "variavel": 0,
+      "corte": 2.3925,
+      "esq": 4,
+      "dir": 5,
+      "ganho": 0.28571428571428564
+     },
+     {
+      "id": 3,
+      "folha": true,
+      "valor": 0.05555555555555553,
+      "n": 18,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     },
+     {
+      "id": 4,
+      "folha": true,
+      "valor": 1.0,
+      "n": 7,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     },
+     {
+      "id": 5,
+      "folha": true,
+      "valor": 0.7142857142857143,
+      "n": 7,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     }
+    ],
+    [
+     {
+      "id": 1,
+      "folha": false,
+      "valor": 0.0,
+      "n": 32,
+      "variavel": 1,
+      "corte": 107.0,
+      "esq": 2,
+      "dir": 3,
+      "ganho": 0.3448177924368401
+     },
+     {
+      "id": 2,
+      "folha": false,
+      "valor": -0.15396825396825398,
+      "n": 10,
+      "variavel": 0,
+      "corte": 2.26,
+      "esq": 4,
+      "dir": 5,
+      "ganho": 0.23706223230032747
+     },
+     {
+      "id": 3,
+      "folha": false,
+      "valor": 0.06998556998557,
+      "n": 22,
+      "variavel": 0,
+      "corte": 3.1925,
+      "esq": 6,
+      "dir": 7,
+      "ganho": 0.23315209922352775
+     },
+     {
+      "id": 4,
+      "folha": true,
+      "valor": 0.0,
+      "n": 5,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     },
+     {
+      "id": 5,
+      "folha": true,
+      "valor": -0.30793650793650795,
+      "n": 5,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     },
+     {
+      "id": 6,
+      "folha": true,
+      "valor": 0.23809523809523808,
+      "n": 6,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     },
+     {
+      "id": 7,
+      "folha": true,
+      "valor": 0.0069444444444444475,
+      "n": 16,
+      "variavel": null,
+      "corte": null,
+      "esq": null,
+      "dir": null
+     }
+    ]
+   ],
+   "previsoes": [
+    0.9523809523809523,
+    0.9523809523809523,
+    0.692063492063492,
+    0.06249999999999998,
+    0.06249999999999998,
+    -0.25238095238095243,
+    0.06249999999999998,
+    -0.25238095238095243,
+    0.40634920634920635,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    1.0,
+    1.0,
+    1.0,
+    0.40634920634920635,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    0.06249999999999998,
+    1.0,
+    1.0,
+    1.2380952380952381,
+    0.9523809523809523,
+    0.9523809523809523,
+    0.06249999999999998,
+    0.9523809523809523
+   ],
+   "acertos": 31,
+   "divisoes": 5,
+   "ops": 520,
+   "cortes": 240,
+   "uma": {
+    "arvores": [
+     [
+      {
+       "id": 1,
+       "folha": false,
+       "valor": 0.0,
+       "n": 32,
+       "variavel": 0,
+       "corte": 3.1799999999999997,
+       "esq": 2,
+       "dir": 3,
+       "ganho": 5.060019841269841
+      },
+      {
+       "id": 2,
+       "folha": false,
+       "valor": 0.8571428571428571,
+       "n": 14,
+       "variavel": 0,
+       "corte": 2.3925,
+       "esq": 4,
+       "dir": 5,
+       "ganho": 0.28571428571428564
+      },
+      {
+       "id": 3,
+       "folha": false,
+       "valor": 0.05555555555555553,
+       "n": 18,
+       "variavel": 1,
+       "corte": 210.0,
+       "esq": 6,
+       "dir": 7,
+       "ganho": 0.1444444444444444
+      },
+      {
+       "id": 4,
+       "folha": true,
+       "valor": 1.0,
+       "n": 7,
+       "variavel": null,
+       "corte": null,
+       "esq": null,
+       "dir": null
+      },
+      {
+       "id": 5,
+       "folha": true,
+       "valor": 0.7142857142857143,
+       "n": 7,
+       "variavel": null,
+       "corte": null,
+       "esq": null,
+       "dir": null
+      },
+      {
+       "id": 6,
+       "folha": true,
+       "valor": 0.0,
+       "n": 13,
+       "variavel": null,
+       "corte": null,
+       "esq": null,
+       "dir": null
+      },
+      {
+       "id": 7,
+       "folha": true,
+       "valor": 0.19999999999999998,
+       "n": 5,
+       "variavel": null,
+       "corte": null,
+       "esq": null,
+       "dir": null
+      }
+     ]
+    ],
+    "previsoes": [
+     0.7142857142857143,
+     0.7142857142857143,
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.19999999999999998,
+     0.0,
+     0.7142857142857143,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.19999999999999998,
+     0.19999999999999998,
+     1.0,
+     1.0,
+     1.0,
+     0.7142857142857143,
+     0.0,
+     0.0,
+     0.19999999999999998,
+     0.0,
+     1.0,
+     1.0,
+     1.0,
+     0.7142857142857143,
+     0.7142857142857143,
+     0.19999999999999998,
+     0.7142857142857143
+    ],
+    "acertos": 29,
+    "divisoes": 3,
+    "ops": 154,
+    "cortes": 62
+   }
+  },
+  "medido": {
+   "tempo": {
+    "unidade": "resíduos somados",
+    "tipo": "figs",
+    "series": [
+     {
+      "caso": "figs",
+      "nome": "FIGS (média)"
+     },
+     {
+      "caso": "uma",
+      "nome": "uma árvore só (média)"
+     }
+    ],
+    "banda": "figs",
+    "crescimento": [
+     {
+      "n": 32,
+      "figs": {
+       "media": 589.2,
+       "min": 518,
+       "max": 706,
+       "pico": 354
+      },
+      "uma": {
+       "media": 157.2,
+       "min": 128,
+       "max": 172,
+       "pico": 202
+      }
+     },
+     {
+      "n": 64,
+      "figs": {
+       "media": 1083.4,
+       "min": 854,
+       "max": 1278,
+       "pico": 665
+      },
+      "uma": {
+       "media": 380.4,
+       "min": 342,
+       "max": 420,
+       "pico": 394
+      }
+     },
+     {
+      "n": 128,
+      "figs": {
+       "media": 1826.6,
+       "min": 1720,
+       "max": 2218,
+       "pico": 1055
+      },
+      "uma": {
+       "media": 752.8,
+       "min": 696,
+       "max": 824,
+       "pico": 778
+      }
+     },
+     {
+      "n": 256,
+      "figs": {
+       "media": 3726.8,
+       "min": 3494,
+       "max": 4608,
+       "pico": 2079
+      },
+      "uma": {
+       "media": 1576.4,
+       "min": 1446,
+       "max": 1720,
+       "pico": 1546
+      }
+     },
+     {
+      "n": 512,
+      "figs": {
+       "media": 7569.8,
+       "min": 6892,
+       "max": 10240,
+       "pico": 4127
+      },
+      "uma": {
+       "media": 3193.8,
+       "min": 2796,
+       "max": 3360,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 1024,
+      "figs": {
+       "media": 15393.2,
+       "min": 14528,
+       "max": 18432,
+       "pico": 8223
+      },
+      "uma": {
+       "media": 6421.6,
+       "min": 6306,
+       "max": 6558,
+       "pico": 6154
+      }
+     },
+     {
+      "n": 2048,
+      "figs": {
+       "media": 30029.6,
+       "min": 29080,
+       "max": 36864,
+       "pico": 16415
+      },
+      "uma": {
+       "media": 12886.6,
+       "min": 12696,
+       "max": 13188,
+       "pico": 12298
+      }
+     },
+     {
+      "n": 4096,
+      "figs": {
+       "media": 59958.2,
+       "min": 58126,
+       "max": 73728,
+       "pico": 32799
+      },
+      "uma": {
+       "media": 25682.6,
+       "min": 25358,
+       "max": 26000,
+       "pico": 24586
+      }
+     }
+    ],
+    "eixo": "n (carros; dobra a cada passo)",
+    "refs": [],
+    "refs_memoria": [],
+    "crescimento_dados": "carros sorteados, média de 10 sorteios por tamanho, s = 5",
+    "por_k": [
+     {
+      "n": 1,
+      "figs": {
+       "media": 1024,
+       "min": 1024,
+       "max": 1024,
+       "pico": 3082
+      },
+      "uma": {
+       "media": 1024,
+       "min": 1024,
+       "max": 1024,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 2,
+      "figs": {
+       "media": 3072,
+       "min": 3072,
+       "max": 3072,
+       "pico": 3082
+      },
+      "uma": {
+       "media": 2048,
+       "min": 2048,
+       "max": 2048,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 4,
+      "figs": {
+       "media": 6188,
+       "min": 5694,
+       "max": 7696,
+       "pico": 4121
+      },
+      "uma": {
+       "media": 2938.4,
+       "min": 2622,
+       "max": 3072,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 8,
+      "figs": {
+       "media": 11413.6,
+       "min": 10610,
+       "max": 16998,
+       "pico": 4145
+      },
+      "uma": {
+       "media": 3634.8,
+       "min": 3442,
+       "max": 3910,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 16,
+      "figs": {
+       "media": 21314.2,
+       "min": 19352,
+       "max": 35840,
+       "pico": 5220
+      },
+      "uma": {
+       "media": 4304.2,
+       "min": 3980,
+       "max": 4762,
+       "pico": 3082
+      }
+     },
+     {
+      "n": 32,
+      "figs": {
+       "media": 42613.8,
+       "min": 36824,
+       "max": 78066,
+       "pico": 5316
+      },
+      "uma": {
+       "media": 5412.8,
+       "min": 5080,
+       "max": 6036,
+       "pico": 3082
+      }
+     }
+    ],
+    "eixo_k": "s (divisões; dobra a cada passo)",
+    "k_fixo": 5,
+    "n_fixo": 512
+   },
+   "memoria": {
+    "pico": 287,
+    "detalhe": {
+     "residuos": 32,
+     "ordens": 192,
+     "somas": 33,
+     "arvores": 30
+    }
+   },
+   "ciclomatica": {
+    "M": 10,
+    "nos": 31,
+    "arestas": 39,
+    "decisoes": [
+     {
+      "linha": 7,
+      "tipo": "for"
+     },
+     {
+      "linha": 9,
+      "tipo": "for"
+     },
+     {
+      "linha": 10,
+      "tipo": "if"
+     },
+     {
+      "linha": 13,
+      "tipo": "for"
+     },
+     {
+      "linha": 15,
+      "tipo": "for"
+     },
+     {
+      "linha": 20,
+      "tipo": "for"
+     },
+     {
+      "linha": 23,
+      "tipo": "if"
+     },
+     {
+      "linha": 25,
+      "tipo": "if"
+     },
+     {
+      "linha": 27,
+      "tipo": "if"
+     }
+    ],
+    "grafo": {
+     "nos": [
+      {
+       "id": 0,
+       "linha": 1,
+       "rotulo": "início"
+      },
+      {
+       "id": 1,
+       "linha": 2,
+       "rotulo": "assign"
+      },
+      {
+       "id": 2,
+       "linha": 3,
+       "rotulo": "assign"
+      },
+      {
+       "id": 3,
+       "linha": 4,
+       "rotulo": "assign"
+      },
+      {
+       "id": 4,
+       "linha": 5,
+       "rotulo": "assign"
+      },
+      {
+       "id": 5,
+       "linha": 6,
+       "rotulo": "expr"
+      },
+      {
+       "id": 6,
+       "linha": 7,
+       "rotulo": "for"
+      },
+      {
+       "id": 7,
+       "linha": 8,
+       "rotulo": "assign"
+      },
+      {
+       "id": 8,
+       "linha": 9,
+       "rotulo": "for"
+      },
+      {
+       "id": 9,
+       "linha": 10,
+       "rotulo": "if"
+      },
+      {
+       "id": 10,
+       "linha": 11,
+       "rotulo": "assign"
+      },
+      {
+       "id": 11,
+       "linha": 12,
+       "rotulo": "assign"
+      },
+      {
+       "id": 12,
+       "linha": 13,
+       "rotulo": "for"
+      },
+      {
+       "id": 13,
+       "linha": 14,
+       "rotulo": "assign"
+      },
+      {
+       "id": 14,
+       "linha": 15,
+       "rotulo": "for"
+      },
+      {
+       "id": 15,
+       "linha": 16,
+       "rotulo": "expr"
+      },
+      {
+       "id": 16,
+       "linha": 17,
+       "rotulo": "augassign"
+      },
+      {
+       "id": 17,
+       "linha": 18,
+       "rotulo": "expr"
+      },
+      {
+       "id": 18,
+       "linha": 19,
+       "rotulo": "expr"
+      },
+      {
+       "id": 19,
+       "linha": 20,
+       "rotulo": "for"
+      },
+      {
+       "id": 20,
+       "linha": 21,
+       "rotulo": "expr"
+      },
+      {
+       "id": 21,
+       "linha": 22,
+       "rotulo": "assign"
+      },
+      {
+       "id": 22,
+       "linha": 23,
+       "rotulo": "if"
+      },
+      {
+       "id": 23,
+       "linha": 24,
+       "rotulo": "assign"
+      },
+      {
+       "id": 24,
+       "linha": 25,
+       "rotulo": "if"
+      },
+      {
+       "id": 25,
+       "linha": 26,
+       "rotulo": "assign"
+      },
+      {
+       "id": 26,
+       "linha": 27,
+       "rotulo": "if"
+      },
+      {
+       "id": 27,
+       "linha": 28,
+       "rotulo": "break"
+      },
+      {
+       "id": 28,
+       "linha": 29,
+       "rotulo": "expr"
+      },
+      {
+       "id": 29,
+       "linha": 30,
+       "rotulo": "return"
+      },
+      {
+       "id": 30,
+       "linha": 31,
+       "rotulo": "fim"
+      }
+     ],
+     "arestas": [
+      {
+       "de": 0,
+       "para": 1,
+       "tipo": "segue"
+      },
+      {
+       "de": 1,
+       "para": 2,
+       "tipo": "segue"
+      },
+      {
+       "de": 2,
+       "para": 3,
+       "tipo": "segue"
+      },
+      {
+       "de": 3,
+       "para": 4,
+       "tipo": "segue"
+      },
+      {
+       "de": 4,
+       "para": 5,
+       "tipo": "segue"
+      },
+      {
+       "de": 5,
+       "para": 6,
+       "tipo": "segue"
+      },
+      {
+       "de": 6,
+       "para": 7,
+       "tipo": "segue"
+      },
+      {
+       "de": 7,
+       "para": 8,
+       "tipo": "segue"
+      },
+      {
+       "de": 8,
+       "para": 9,
+       "tipo": "segue"
+      },
+      {
+       "de": 9,
+       "para": 10,
+       "tipo": "segue"
+      },
+      {
+       "de": 10,
+       "para": 11,
+       "tipo": "segue"
+      },
+      {
+       "de": 11,
+       "para": 12,
+       "tipo": "segue"
+      },
+      {
+       "de": 12,
+       "para": 13,
+       "tipo": "segue"
+      },
+      {
+       "de": 13,
+       "para": 14,
+       "tipo": "segue"
+      },
+      {
+       "de": 14,
+       "para": 15,
+       "tipo": "segue"
+      },
+      {
+       "de": 15,
+       "para": 16,
+       "tipo": "segue"
+      },
+      {
+       "de": 16,
+       "para": 17,
+       "tipo": "segue"
+      },
+      {
+       "de": 17,
+       "para": 14,
+       "tipo": "volta"
+      },
+      {
+       "de": 14,
+       "para": 18,
+       "tipo": "segue"
+      },
+      {
+       "de": 18,
+       "para": 19,
+       "tipo": "segue"
+      },
+      {
+       "de": 19,
+       "para": 20,
+       "tipo": "segue"
+      },
+      {
+       "de": 20,
+       "para": 21,
+       "tipo": "segue"
+      },
+      {
+       "de": 21,
+       "para": 22,
+       "tipo": "segue"
+      },
+      {
+       "de": 22,
+       "para": 23,
+       "tipo": "segue"
+      },
+      {
+       "de": 23,
+       "para": 19,
+       "tipo": "volta"
+      },
+      {
+       "de": 22,
+       "para": 19,
+       "tipo": "volta"
+      },
+      {
+       "de": 19,
+       "para": 12,
+       "tipo": "volta"
+      },
+      {
+       "de": 12,
+       "para": 24,
+       "tipo": "segue"
+      },
+      {
+       "de": 9,
+       "para": 24,
+       "tipo": "segue"
+      },
+      {
+       "de": 24,
+       "para": 25,
+       "tipo": "segue"
+      },
+      {
+       "de": 25,
+       "para": 8,
+       "tipo": "volta"
+      },
+      {
+       "de": 24,
+       "para": 8,
+       "tipo": "volta"
+      },
+      {
+       "de": 8,
+       "para": 26,
+       "tipo": "segue"
+      },
+      {
+       "de": 26,
+       "para": 27,
+       "tipo": "segue"
+      },
+      {
+       "de": 26,
+       "para": 28,
+       "tipo": "segue"
+      },
+      {
+       "de": 28,
+       "para": 6,
+       "tipo": "volta"
+      },
+      {
+       "de": 6,
+       "para": 29,
+       "tipo": "segue"
+      },
+      {
+       "de": 27,
+       "para": 29,
+       "tipo": "segue"
+      },
+      {
+       "de": 29,
+       "para": 30,
+       "tipo": "segue"
+      }
+     ]
+    },
+    "codigo": "def figs(X, y, max_divisoes, conta, max_arvores=None):\n    n = len(y)\n    residuos = conta.aloca(\"residuos\", list(map(float, y)))\n    arvores = []\n    candidatas = [candidata(X, list(range(n)), 0, 1)]\n    conta.ocupa(\"ordens\", len(X[0]) * n)\n    for passo in range(max_divisoes):\n        melhor, ganho = None, -math.inf\n        for c in candidatas:\n            if c[\"suja\"]:\n                c[\"suja\"], c[\"ganho\"], c[\"corte\"] = False, -math.inf, None\n                m = media_de(residuos, c[\"linhas\"])\n                for q, j in enumerate(c[\"variaveis\"]):\n                    s, soma = [0.0], 0.0\n                    for i in c[\"ordem\"][j]:\n                        conta.op(\"somas\")\n                        soma += residuos[i] - m\n                        s.append(soma)\n                    conta.aloca(\"somas\", s)\n                    for corte, e in c[\"cortes\"][q]:\n                        conta.op(\"cortes\")\n                        g = s[e] ** 2 / e + (soma - s[e]) ** 2 / (len(s) - 1 - e) - soma ** 2 / (len(s) - 1)\n                        if bate(g, c[\"ganho\"]):\n                            c[\"ganho\"], c[\"corte\"] = g, (j, corte)\n            if bate(c[\"ganho\"], ganho):\n                melhor, ganho = c, c[\"ganho\"]\n        if ganho <= GANHO_MINIMO:\n            break\n        dividir(X, melhor, residuos, arvores, candidatas, max_arvores, conta)\n    return arvores\n"
+   }
+  },
+  "conferencia": {
+   "referencia": "figsr::figs(mode = \"classification\", min_n = 5), figsr 0.2.0.9000",
+   "versao_r": "4.5.3",
+   "versao_figsr": "0.2.0.9000",
+   "casos": 27,
+   "maior_diferenca": 2.2204e-16,
+   "acertos_r": 31,
+   "acertos_python": 31,
+   "tudo_ok": true,
+   "resumo": "Nos mesmos dados, o figs() do figsr 0.2.0.9000 (R 4.5.3) monta as mesmas árvores, com os mesmos cortes, e dá as mesmas previsões em 27 ajustes (o mtcars com s de 1 a 10, com várias árvores e com uma só, e carros sorteados); a maior diferença é 2.22e-16. No exemplo, os dois acertam 31 de 32 carros."
+  },
+  "pseudocodigo": {
+   "assinatura": "figs(X, y, s)",
+   "nome": "figs",
+   "arvore": [
+    {
+     "tipo": "acao",
+     "linha": 2,
+     "texto": "resíduos ← y, em 0 e 1;  árvores ← nenhuma",
+     "chamada": false
+    },
+    {
+     "tipo": "acao",
+     "linha": 3,
+     "texto": "candidatas ← a raiz de uma árvore nova, com os n exemplos",
+     "chamada": false
+    },
+    {
+     "tipo": "laco",
+     "rotulo": "para",
+     "linha": 4,
+     "op": "e",
+     "conds": [
+      "para passo de 1 até s"
+     ],
+     "corpo": [
+      {
+       "tipo": "acao",
+       "linha": 5,
+       "texto": "melhor ← nenhuma;  maior ← −∞",
+       "chamada": false
+      },
+      {
+       "tipo": "laco",
+       "rotulo": "para",
+       "linha": 6,
+       "op": "e",
+       "conds": [
+        "para cada candidata c"
+       ],
+       "corpo": [
+        {
+         "tipo": "se",
+         "linha": 7,
+         "op": "e",
+         "conds": [
+          "algum resíduo de c mudou"
+         ],
+         "entao": [
+          {
+           "tipo": "acao",
+           "linha": 8,
+           "texto": "c.ganho ← −∞;  m ← a média dos resíduos de c",
+           "chamada": false
+          },
+          {
+           "tipo": "laco",
+           "rotulo": "para",
+           "linha": 9,
+           "op": "e",
+           "conds": [
+            "para cada variável j"
+           ],
+           "corpo": [
+            {
+             "tipo": "acao",
+             "linha": 10,
+             "texto": "soma ← 0;  S ← [0]",
+             "chamada": false
+            },
+            {
+             "tipo": "laco",
+             "rotulo": "para",
+             "linha": 11,
+             "op": "e",
+             "conds": [
+              "para cada exemplo i de c, em ordem de x_j"
+             ],
+             "corpo": [
+              {
+               "tipo": "acao",
+               "linha": 12,
+               "texto": "soma ← soma + resíduo[i] − m;  anote soma em S",
+               "chamada": false
+              }
+             ]
+            },
+            {
+             "tipo": "laco",
+             "rotulo": "para",
+             "linha": 13,
+             "op": "e",
+             "conds": [
+              "para cada corte de x_j com e exemplos à esquerda e 5 ou mais de cada lado"
+             ],
+             "corpo": [
+              {
+               "tipo": "acao",
+               "linha": 14,
+               "texto": "ganho ← S[e]²/e + (soma − S[e])²/(n − e) − soma²/n",
+               "chamada": false
+              },
+              {
+               "tipo": "se",
+               "linha": 15,
+               "op": "e",
+               "conds": [
+                "ganho > c.ganho"
+               ],
+               "entao": [
+                {
+                 "tipo": "acao",
+                 "linha": 16,
+                 "texto": "c.ganho ← ganho;  c.corte ← (j, corte)",
+                 "chamada": false
+                }
+               ],
+               "senao": null
+              }
+             ]
+            }
+           ]
+          }
+         ],
+         "senao": null
+        },
+        {
+         "tipo": "se",
+         "linha": 17,
+         "op": "e",
+         "conds": [
+          "c.ganho > maior"
+         ],
+         "entao": [
+          {
+           "tipo": "acao",
+           "linha": 18,
+           "texto": "melhor ← c;  maior ← c.ganho",
+           "chamada": false
+          }
+         ],
+         "senao": null
+        }
+       ]
+      },
+      {
+       "tipo": "se",
+       "linha": 19,
+       "op": "e",
+       "conds": [
+        "maior ≤ 0,000001"
+       ],
+       "entao": [
+        {
+         "tipo": "pare",
+         "linha": 20
+        }
+       ],
+       "senao": null
+      },
+      {
+       "tipo": "acao",
+       "linha": 21,
+       "texto": "divida melhor em duas folhas, pelo corte dela",
+       "chamada": false
+      },
+      {
+       "tipo": "acao",
+       "linha": 22,
+       "texto": "cada folha soma à previsão a média dos resíduos dela",
+       "chamada": false
+      },
+      {
+       "tipo": "acao",
+       "linha": 23,
+       "texto": "tire essa média dos resíduos dos exemplos da folha",
+       "chamada": false
+      },
+      {
+       "tipo": "acao",
+       "linha": 24,
+       "texto": "marque como mudadas as candidatas com algum desses exemplos",
+       "chamada": false
+      }
+     ]
+    },
+    {
+     "tipo": "devolva",
+     "linha": 25,
+     "texto": "devolva árvores"
+    }
+   ],
+   "linhas": [
+    "procedimento figs(X, y, s):",
+    "    resíduos ← y, em 0 e 1;  árvores ← nenhuma",
+    "    candidatas ← a raiz de uma árvore nova, com os n exemplos",
+    "    para passo de 1 até s:",
+    "        melhor ← nenhuma;  maior ← −∞",
+    "        para cada candidata c:",
+    "            se algum resíduo de c mudou:",
+    "                c.ganho ← −∞;  m ← a média dos resíduos de c",
+    "                para cada variável j:",
+    "                    soma ← 0;  S ← [0]",
+    "                    para cada exemplo i de c, em ordem de x_j:",
+    "                        soma ← soma + resíduo[i] − m;  anote soma em S",
+    "                    para cada corte de x_j com e exemplos à esquerda e 5 ou mais de cada lado:",
+    "                        ganho ← S[e]²/e + (soma − S[e])²/(n − e) − soma²/n",
+    "                        se ganho > c.ganho:",
+    "                            c.ganho ← ganho;  c.corte ← (j, corte)",
+    "            se c.ganho > maior:",
+    "                melhor ← c;  maior ← c.ganho",
+    "        se maior ≤ 0,000001:",
+    "            pare",
+    "        divida melhor em duas folhas, pelo corte dela",
+    "        cada folha soma à previsão a média dos resíduos dela",
+    "        tire essa média dos resíduos dos exemplos da folha",
+    "        marque como mudadas as candidatas com algum desses exemplos",
+    "    devolva árvores"
+   ],
+   "M": 10,
+   "nos": 26,
+   "arestas": 34,
+   "decisoes": [
+    4,
+    6,
+    7,
+    9,
+    11,
+    13,
+    15,
+    17,
+    19
+   ]
+  }
  }
 ];
 window.PLAYLISTS = [
@@ -26658,6 +28113,22 @@ window.PLAYLISTS = [
     "titulo": "com custo nas ligações",
     "faixas": [
      "dijkstra"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "classificar-um-exemplo",
+  "bloco": "Aprender com exemplos",
+  "titulo": "Classificar um exemplo",
+  "cor": "laranja",
+  "codigo": "CE",
+  "frase": "Olhar um exemplo e dizer de que classe ele é, com uma regra aprendida de exemplos que já vêm com a resposta.",
+  "subcategorias": [
+   {
+    "titulo": "somando árvores pequenas",
+    "faixas": [
+     "figs"
     ]
    }
   ]
@@ -27020,6 +28491,24 @@ window.CONCEITOS = {
    "resumo": "Cada playlist é um problema, e cada faixa é um jeito de resolvê-lo.",
    "video": "videos/conceitos-6.mp4",
    "duracao": 26.1
+  }
+ ]
+};
+window.CLASSIFICAR = {
+ "id": "classificar",
+ "titulo": "Aprender com exemplos",
+ "cor": "laranja",
+ "codigo": "CE",
+ "capa": "provisoria",
+ "frase": "Olhar um exemplo e dizer de que classe ele é, com uma regra aprendida de exemplos que já vêm com a resposta.",
+ "nota": "Os vídeos das faixas de Classificar um exemplo, um por faixa, no molde de Conceitos importantes e Fundamentos. A playlist de vídeo só aparece quando algum vídeo tem \"video\" (o caminho do arquivo). O projeto dos vídeos é o bonijoao/big-o-player-videos. A capa fica provisória até a CE-01 desenhada (docs/capas-classificacao.md).",
+ "videos": [
+  {
+   "n": 1,
+   "titulo": "FIGS",
+   "resumo": "Árvores rasas que crescem juntas, um corte por vez; a previsão é a soma de uma folha de cada.",
+   "video": "videos/classificar-1.mp4",
+   "duracao": 86.4
   }
  ]
 };

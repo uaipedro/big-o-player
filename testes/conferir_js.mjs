@@ -46,7 +46,7 @@ function confereLinhas(pasta, eventos) {
     proximo: "passo", vira: "passo", tira: "passo", poe: "passo", maximo: "passo",
     busca: "decisao", dispersa: "passo", inicio: "passo", sonda: "decisao", liga: "passo",
     desce: "passo", novo: "passo", gira: "passo", girou: "passo", equilibra: "passo",
-    multiplica: ["passo", "chamada"], soma: ["passo", "chamada"], lembra: "passo", guarda: "passo", encosta: "laco" };   // o retorno volta à linha da chamada; rótulo: o teste "≠" ou a troca
+    multiplica: ["passo", "chamada"], soma: ["passo", "chamada"], ganho: "passo", divide: "passo", residuos: "passo", marca: "passo", lembra: "passo", guarda: "passo", encosta: "laco" };   // o retorno volta à linha da chamada; rótulo: o teste "≠" ou a troca
   let erros = 0;
   for (const e of eventos) {
     if (e.linha === undefined) continue;
@@ -108,6 +108,8 @@ function confereVars(pasta, vetor, eventos) {
     avl: (e) => (e.t !== "compara" || (e.vars["p.valor"] !== null && e.vars.x !== e.vars["p.valor"] || e.linha === 4)) && (e.t !== "entra" || (e.a === null) === (e.vars["p.valor"] === null)),
     histograma: (e) => (e.t !== "le" || e.vars.i === e.i + 1) && (e.t !== "conta" || (e.vars.i === e.i + 1 && e.vars.j === e.j + 1))
       && (e.t !== "classes" || e.vars.c > 0),
+    figs: (e) => (e.t !== "soma" || (e.vars.soma === e.soma && e.vars.i === e.i + 1 && e.vars.j === e.j + 1))
+      && (e.t !== "ganho" || (e.vars.ganho === e.g && e.vars.j === e.j + 1)) && (e.t !== "atribui" || e.linha !== 16 || e.vars["c.ganho"] === e.g),
     kmeans: (e) => e.t !== "dist" || (e.vars.i === e.i + 1 && e.vars.j === e.j + 1 && e.vars[e.linha === 7 ? "menor" : "d"] === e.x),
     palavras: (e) => e.t === "atribui" || e.t === "devolva" || (e.vars.i === e.i + 1 && typeof e.vars["p[i]"] === "string")
       && (e.t !== "poe" || (e.vars["d[p[i]]"] === 1 && e.vars["palavras distintas"] >= 1)) && (e.t !== "conta" || e.vars["d[p[i]]"] >= 2),
@@ -132,8 +134,8 @@ function confereVars(pasta, vetor, eventos) {
     if (e.t === "entra") abertas.push(e.chamada);
     if (e.t === "sai") { abertas.pop(); if (e.nivel !== abertas.length || e.chamada !== (abertas.at(-1) ?? 0)) { if (erros++ < 3) console.log(`  ✗ ${pasta}: retorno no nível ${e.nivel}, chamada ${e.chamada}`); } }
     // escalares: número, booleano, null ou um símbolo (os parênteses mostram o caractere lido)
-    // (contar palavras mostra a palavra da vez)
-    const escalares = e.vars && Object.values(e.vars).every((x) => x === null || typeof x === "number" || typeof x === "boolean" || (typeof x === "string" && (x.length === 1 || pasta === "palavras" || pasta === "fatorial")));
+    // (contar palavras mostra a palavra da vez; o FIGS, a candidata da vez)
+    const escalares = e.vars && Object.values(e.vars).every((x) => x === null || typeof x === "number" || typeof x === "boolean" || (typeof x === "string" && (x.length === 1 || pasta === "palavras" || pasta === "fatorial" || pasta === "figs")));
     if (!escalares || !regra(e)) { if (erros++ < 3) console.log(`  ✗ ${pasta}: variáveis do evento ${e.t} ${JSON.stringify(e.vars)}`); }
     if (v && e.t === "troca") { const x = v[e.i]; v[e.i] = v[e.j]; v[e.j] = x; }
     if (v && e.t === "escreve" && e.onde === "v") v[e.k] = e.x;
@@ -171,6 +173,24 @@ for (const pasta of ["bolha", "insercao", "selecao", "intercalacao", "rapida", "
   ok = confereLinhas("kmeans", r.eventos) && ok;
   ok = confereVars("kmeans", null, r.eventos) && ok;
   console.log(`${ok ? "ok" : "FALHOU"}: kmeans`);
+}
+
+{
+  const d = ler("algoritmos/figs/dados.json"), ex = d.exemplo;
+  // as árvores comparadas campo a campo, na mesma ordem (o JSON do Python e o objeto do JS)
+  const forma = (arvores) => arvores.map((a) => a.map((q) => [q.id, q.folha, q.valor, q.n, q.variavel, q.corte, q.esq, q.dir]));
+  const medidas = (r) => ({ arvores: forma(r.arvores), previsoes: r.previsoes, acertos: r.acertos, somas: r.somas, cortes: r.cortes, pico: r.pico });
+  const casos = [{ caso: "encarte", X: ex.X, y: ex.y, s: ex.s, max_arvores: null, arvores: ex.arvores, previsoes: ex.previsoes, acertos: ex.acertos,
+    somas: ex.ops, cortes: ex.cortes, pico: d.memoria.pico },
+  { caso: "encarte, uma árvore só", X: ex.X, y: ex.y, s: ex.s, max_arvores: 1, ...ex.uma, somas: ex.uma.ops, pico: undefined }, ...d.conferir];
+  let ok = true;
+  for (const c of casos) {
+    const r = A.figs(c.X, c.y, c.s, c.max_arvores), m = medidas(r), e = medidas(c);
+    if (c.pico === undefined) delete m.pico, delete e.pico;
+    ok = confere(`figs ${c.caso}`, m, e) && ok;
+    ok = confereLinhas("figs", r.eventos) && confereVars("figs", null, r.eventos) && ok;
+  }
+  console.log(`${ok ? "ok" : "FALHOU"}: figs (${casos.length} ajustes)`);
 }
 
 // ---------- buscas, parênteses e fila de atendimento ----------

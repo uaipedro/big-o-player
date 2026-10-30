@@ -1,4 +1,4 @@
-// O player: as seções (conceitos, fundamentos, playlists por problema, algoritmos e
+// O player: as seções (conceitos, fundamentos, classificar, playlists por problema, algoritmos e
 // estruturas), as faixas (algoritmos), o palco que vira mini player arrastável e o
 // encarte de cada faixa. Os números vêm de dados.js.
 (function () {
@@ -13,8 +13,8 @@
     const subcategorias = p.subcategorias.map((s) => ({ ...s, faixas: s.faixas.map((n) => porAlg[n]).filter(Boolean) }));
     return { ...p, subcategorias, faixas: subcategorias.flatMap((s) => s.faixas) };
   });
-  // as duas playlists de vídeo, na ordem da home; cada uma só existe com algum vídeo pronto
-  const SERIES = [{ id: "conceitos", ...(window.CONCEITOS || {}) }, { id: "fundamentos", ...(window.FUNDAMENTOS || {}) }]
+  // as playlists de vídeo, na ordem da home; cada uma só existe com algum vídeo pronto
+  const SERIES = [{ id: "conceitos", ...(window.CONCEITOS || {}) }, { id: "fundamentos", ...(window.FUNDAMENTOS || {}) }, { id: "classificar", ...(window.CLASSIFICAR || {}) }]
     .map((s) => ({ ...s, prontos: (s.videos || []).filter((v) => v.video) })).filter((s) => s.prontos.length)
     .map((s) => ({ ...s, faixas: s.prontos.map((v) => ({ id: `${s.id}-${v.n}`, nome: v.titulo, objetivo: v.resumo, arquivo: v.video,
       duracao: v.duracao || 0, capa: v.capa || null, poster: "icone.png", n: v.n })) }));
@@ -283,7 +283,7 @@
   // as três barras que sobem e descem na faixa que toca (paradas com movimento reduzido)
   const equalizador = () => el("span", { class: "eq", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]);
 
-  // ---------- as playlists de vídeo (Conceitos importantes e Fundamentos): só com vídeo pronto ----------
+  // ---------- as playlists de vídeo (Conceitos importantes, Fundamentos e Classificar um exemplo): só com vídeo pronto ----------
 
   function paginaVideos(s) {
     return el("div", { class: `playlist ${corDe(s)}` }, [
@@ -334,6 +334,7 @@
     grafo: { entrada: "vértices", conta: (ex) => `${ex.n} vértices e ${ex.arestas.length} arestas, ${nomeEstrutura(ex)} de até ${ex.estrutura}, no grafo do encarte` },
     mediana: { entrada: "números", conta: (ex) => `${ex.n} volumes, mediana ${num(ex.mediana, 1)} (a média é ${num(ex.media, 1)}), na entrada do encarte` },
     welford: { entrada: "valores", conta: (ex) => `${ex.n} anos lidos uma vez, variância de ${num(ex.variancia, 4)} pés², na entrada do encarte` },
+    figs: { entrada: "carros", conta: (ex) => `${ex.n} carros, ${ex.divisoes} divisões em ${ex.arvores.length} árvores, ${ex.acertos} certos; a árvore única, com as mesmas ${ex.s}, para em ${ex.uma.divisoes} e acerta ${ex.uma.acertos}` },
     histograma: { entrada: "valores", conta: (ex) => `${ex.n} erupções em ${ex.c} classes de ${num(ex.h, 1)} min, na entrada do encarte` },
     palavras: { entrada: "palavras", artigo: "das", conta: (ex) => `${ex.n} palavras, ${ex.d} distintas, numa tabela que terminou com ${ex.m} casas, na Canção do Exílio` },
     repetidos: { entrada: "números", conta: (ex) => `${ex.n} números, ${ex.repetido.filter(Boolean).length} repetidos; o vetor faria ${ex.ops_vetor}, no vetor do encarte` },
@@ -634,6 +635,9 @@
     // o Welford roda sempre sobre os 98 anos do encarte; o menu só soma uma constante a todos
     welford: { rotulo: "somar", ns: [98], nFixo: true, semSorteio: true,
       opcoes: [["padrao", "nada (o do encarte)", "o LakeHuron do encarte"], ["d6", "10⁶", "o LakeHuron + 10⁶"], ["d8", "10⁸", "o LakeHuron + 10⁸"], ["d9", "10⁹", "o LakeHuron + 10⁹"]] },
+    // o FIGS roda sempre sobre os 32 carros do encarte: o menu troca o modelo, e o s é o número de divisões
+    figs: { rotulo: "modelo", ns: [32], nFixo: true, semSorteio: true, k: "s", ks: [1, 2, 3, 4, 5, 6, 8, 10],
+      opcoes: [["padrao", "FIGS", "o FIGS, com várias árvores"], ["uma", "uma árvore só", "uma árvore só, com as mesmas divisões"]] },
     histograma: { rotulo: "dados", ns: [50, 100, 200, 400], sortear: "sortear", sorteado: "normal",
       opcoes: [["padrao", "o do encarte", "o faithful do encarte"], ["normal", "normal", "amostra normal"], ["uniforme", "uniforme", "amostra uniforme"], ["bimodal", "bimodal", "amostra bimodal"]] },
     // a contagem de palavras roda sempre sobre a Canção do Exílio: inteira, ou as n primeiras palavras

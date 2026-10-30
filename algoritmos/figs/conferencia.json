@@ -1,0 +1,11 @@
+{
+  "referencia": "figsr::figs(mode = \"classification\", min_n = 5), figsr 0.2.0.9000",
+  "versao_r": "4.5.3",
+  "versao_figsr": "0.2.0.9000",
+  "casos": 27,
+  "maior_diferenca": 2.2204e-16,
+  "acertos_r": 31,
+  "acertos_python": 31,
+  "tudo_ok": true,
+  "resumo": "Nos mesmos dados, o figs() do figsr 0.2.0.9000 (R 4.5.3) monta as mesmas árvores, com os mesmos cortes, e dá as mesmas previsões em 27 ajustes (o mtcars com s de 1 a 10, com várias árvores e com uma só, e carros sorteados); a maior diferença é 2.22e-16. No exemplo, os dois acertam 31 de 32 carros."
+}

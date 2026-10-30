@@ -1,0 +1,57 @@
+{
+ "id": "figs",
+ "nome": "FIGS",
+ "objetivo": "Decidir a classe somando várias árvores pequenas, que dá pra ler de olho.",
+ "variante": "como o figs() do pacote figsr: duas classes, min_n = 5",
+ "familia": "classificação",
+ "resumo": "Em vez de uma árvore funda, várias rasas que crescem juntas. Cada exemplo começa com o erro inteiro: 1 se é da segunda classe, 0 se não é. A cada passo, toda folha de toda árvore, e a raiz de uma árvore nova, procura o corte que mais diminui esse erro, e só o melhor de todos entra. A previsão é a soma de uma folha de cada árvore: o que uma não explicou, a outra explica. Com poucas divisões, o modelo inteiro cabe numa olhada.",
+ "instrumentos": [
+  {
+   "id": "arvore",
+   "papel": "as árvores somadas: cada nó guarda a variável e o corte, e cada folha o valor que entra na soma"
+  },
+  {
+   "id": "vetor",
+   "papel": "os resíduos, um por exemplo: o erro que ainda falta explicar"
+  }
+ ],
+ "tempo": {
+  "notacao": "O(s·t·d·n)",
+  "porque": "Procurar o corte de uma candidata é passar pelos exemplos dela em ordem, uma vez por variável, somando os resíduos: d somas por exemplo. A raiz de uma árvore nova tem os n exemplos e volta à disputa em todo passo, e as folhas de uma mesma árvore dividem os n exemplos entre si. Com s passos e t árvores, nunca passa de s·(t + 1)·d·n somas.",
+  "nota": "A ordem dos exemplos por variável é montada uma vez, quando a candidata nasce, e a filha herda a ordem da mãe sem ordenar de novo. Folha cujos resíduos não mudaram guarda o melhor corte da última busca e não é varrida outra vez: na árvore única, cada passo varre só as duas folhas novas. Com mais de 30 cortes possíveis numa variável, o figsr testa só 30, nos quantis: os cortes testados param de crescer com n, as somas não."
+ },
+ "memoria": {
+  "notacao": "O(t·d·n)",
+  "porque": "Um resíduo por exemplo e, em cada candidata, os exemplos dela em ordem, uma lista por variável. As folhas de uma árvore dividem os n exemplos, então cada árvore guarda d·n, e a raiz nova guarda outros d·n. As árvores em si são poucas casas: variável, corte e valor de cada nó.",
+  "nomes": {
+   "residuos": "resíduos (um por exemplo)",
+   "ordens": "os exemplos de cada candidata, em ordem, por variável",
+   "somas": "as somas da varredura da vez",
+   "arvores": "nós das árvores (variável, corte e valor)"
+  },
+  "cresce_com_n": [
+   "residuos",
+   "ordens",
+   "somas"
+  ],
+  "vazados": "crescem com o número de nós"
+ },
+ "video": {
+  "ideia": [
+   "cada folha, e a raiz de uma árvore nova, testa os seus cortes",
+   "entra o corte que mais diminui o erro; a previsão é a soma das árvores"
+  ]
+ },
+ "graficos": {
+  "titulo": "Tempo: quanto custa abrir árvore nova",
+  "texto": "As mesmas contas para cada vez mais exemplos e cada vez mais divisões, no FIGS e na árvore única. Em escala logarítmica, quem cresce como n sobe em linha reta, com inclinação 1.",
+  "crescimento": "Resíduos somados para n de {n0} a {n1}, com s = {k}. {dados}; a faixa cinza vai do menor ao maior sorteio do FIGS. Os dois sobem retos: dobrou os exemplos, dobra a conta.",
+  "por_k": "Resíduos somados para s de {k0} a {k1} divisões, com n = {nk}. O FIGS paga a raiz de uma árvore nova em todo passo e sobe reto com s; a árvore única só varre as duas folhas novas, que vão ficando menores, e quase deita.",
+  "memoria": "Memória no pico para s de {k0} a {k1} divisões, com n = {nk} (o maior entre os sorteios). Cada árvore nova guarda de novo os n exemplos em ordem; a árvore única guarda sempre uma árvore e a raiz."
+ },
+ "pseudocodigo": "procedimento figs(X, y, s):\n    resíduos ← y, em 0 e 1;  árvores ← nenhuma\n    candidatas ← a raiz de uma árvore nova, com os n exemplos\n    para passo de 1 até s:\n        melhor ← nenhuma;  maior ← −∞\n        para cada candidata c:\n            se algum resíduo de c mudou:\n                c.ganho ← −∞;  m ← a média dos resíduos de c\n                para cada variável j:\n                    soma ← 0;  S ← [0]\n                    para cada exemplo i de c, em ordem de x_j:\n                        soma ← soma + resíduo[i] − m;  anote soma em S\n                    para cada corte de x_j com e exemplos à esquerda e 5 ou mais de cada lado:\n                        ganho ← S[e]²/e + (soma − S[e])²/(n − e) − soma²/n\n                        se ganho > c.ganho:\n                            c.ganho ← ganho;  c.corte ← (j, corte)\n            se c.ganho > maior:\n                melhor ← c;  maior ← c.ganho\n        se maior ≤ 0,000001:\n            pare\n        divida melhor em duas folhas, pelo corte dela\n        cada folha soma à previsão a média dos resíduos dela\n        tire essa média dos resíduos dos exemplos da folha\n        marque como mudadas as candidatas com algum desses exemplos\n    devolva árvores\n",
+ "placa": {
+  "autor": "Yan Shuo Tan, Chandan Singh, Keyan Nasseri, Abhineet Agarwal, James Duncan, Omer Ronen, Matthew Epland, Aaron Kornblith e Bin Yu",
+  "ano": "2022 (arXiv); no PNAS, doi:10.1073/pnas.2310151122"
+ }
+}

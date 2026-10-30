@@ -32,6 +32,7 @@
   --roxo: #643cac;     --sobre-roxo: var(--papel);      /* 6,9:1 */
   --petroleo: #04445c; --sobre-petroleo: var(--papel);  /* 10,3:1; Fundamentos */
   --mostarda: #e4b42c; --sobre-mostarda: var(--tinta);  /* 8,6:1; Achar o maior, a cor da capa do Máximo */
+  --laranja: #ec7a2c;  --sobre-laranja: var(--tinta);   /* 5,9:1; Classificar um exemplo */
   --grupo-1: #2869c3;
   --grupo-2: #8c50b9;
   --grupo-3: #008c96;
@@ -696,6 +697,7 @@ svg text { font-family: var(--mono); }
 .cor-roxo { --cor: var(--roxo); --sobre-cor: var(--sobre-roxo); }
 .cor-petroleo { --cor: var(--petroleo); --sobre-cor: var(--sobre-petroleo); }
 .cor-mostarda { --cor: var(--mostarda); --sobre-cor: var(--sobre-mostarda); }
+.cor-laranja { --cor: var(--laranja); --sobre-cor: var(--sobre-laranja); }
 
 /* em Problemas gerais o cabeçalho fica neutro, e cada faixa leva a cor da própria capa no detalhe:
    a marca da subcategoria e o equalizador (com um contorno de tinta, para se ver em qualquer cor) */
@@ -782,6 +784,7 @@ svg text { font-family: var(--mono); }
 .capa-provisoria { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%;
   aspect-ratio: 1; padding: 7cqi; background: var(--cor); color: var(--sobre-cor); overflow: hidden; }
 .capa-provisoria small { display: flex; justify-content: space-between; gap: 6cqi; font-family: var(--mono); font-size: 5cqi; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2; }
+.capa-provisoria small span:last-child { white-space: nowrap; }   /* o código não quebra quando o nome da playlist é longo */
 .capa-provisoria b { font-family: var(--titulo); font-weight: 400; font-size: 15cqi; line-height: 0.92; letter-spacing: -0.02em; }
 .capa-provisoria.pequena { justify-content: center; align-items: center; padding: 4cqi; }
 .capa-provisoria.pequena small { font-size: 20cqi; font-weight: 600; letter-spacing: 0; }

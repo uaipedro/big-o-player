@@ -19,7 +19,7 @@
   const MONO = '"IBM Plex Mono", ui-monospace, monospace';
   const PASSOS_POR_SEGUNDO = 6;                          // ritmo constante, a 1×
   const RITMO = { ordenacao: 15, kmeans: 30, busca: 4, parenteses: 4, atendimento: 6, inverter: 4, janela: 6, grafo: 6, mediana: 15, welford: 8, histograma: 20, palavras: 8, repetidos: 6, colisao: 5,
-    percursos: 6, abb: 8, avl: 8,
+    percursos: 6, abb: 8, avl: 8, figs: 12,
     matrizes: 8, fatorial: 4, fibonacci: 10, padrao: 8 };          // accelerando: unidades por segundo a 1×
   const CALMO = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;   // sem deslizar
 
@@ -2633,6 +2633,210 @@
     };
   }
 
+  // ---------- FIGS: árvores pequenas que crescem juntas e somam ----------
+
+  function simFigs(faixa, X, y, s, maxArvores, accelerando) {
+    const r = Algoritmos.figs(X, y, s, maxArvores);
+    const N = y.length, ex = faixa.exemplo, nomes = ex.variaveis, ideia = faixa.video.ideia;
+    const CORES = [COR.album, COR.maior, COR.menor, COR.pivo, "#5a7d1e"];   // a cor diz qual árvore, nunca quanto
+    // reprodução: o estado depois de cada evento
+    let arvores = [], res = y.map(Number), cand = null, j = null, i = null, melhorCorte = null, varrendo = null;
+    let somas = 0, cortes = 0, passo = 0, ultima = null;
+    const est = r.eventos.map((e) => {
+      if (e.t === "atribui" && e.linha === 5) { passo++; cand = null; }
+      else if (e.t === "testa" && e.linha === 7) { cand = [e.c, e.no]; j = null; i = null; varrendo = null; if (e.suja) melhorCorte = null; }
+      else if (e.t === "atribui" && e.linha === 10) { j = e.j; i = null; varrendo = e.j; }
+      else if (e.t === "soma") { somas++; i = e.i; }
+      else if (e.t === "ganho") { cortes++; i = null; }
+      else if (e.t === "atribui" && e.linha === 16) melhorCorte = [e.j, e.corte];
+      else if (e.t === "testa" && e.linha === 19) { cand = null; varrendo = null; j = null; i = null; }
+      else if (e.t === "divide") { arvores = e.arvores; ultima = [e.arvore, e.no]; melhorCorte = null; }
+      else if (e.t === "residuos") res = e.residuos;
+      return { t: e.t, linha: e.linha, vars: e.vars, nivel: 0, chamada: 0, arvores, res, cand, j, i, melhorCorte, varrendo, somas, cortes, passo, ultima,
+        corte: e.t === "ganho" ? [e.j, e.corte] : null };
+    });
+    if (somas !== r.somas || cortes !== r.cortes) throw new Error("reprodução do FIGS não bate");
+    // ritmo constante: cada varredura de uma variável vale 1 passo (as somas dividem o passo) e os cortes dela outro;
+    // escolher, dividir e refazer os resíduos, 1 cada
+    const pesos = new Array(est.length).fill(0);
+    const reparte = (ini, fim, total) => { for (let q = ini; q <= fim; q++) pesos[q] = total / (fim - ini + 1); };
+    for (let q = 0; q < est.length;) {
+      const t = est[q].t;
+      if (t === "soma" || t === "ganho" || t === "compara" && est[q].linha === 15 || t === "atribui" && est[q].linha === 16) {
+        let f = q;
+        const bloco = t === "soma" ? (x) => x.t === "soma" : (x) => x.t === "ganho" || (x.t === "compara" && x.linha === 15) || (x.t === "atribui" && x.linha === 16);
+        while (f + 1 < est.length && bloco(est[f + 1])) f++;
+        reparte(q, f, accelerando ? (t === "soma" ? 0.5 : 0.3) : 1);
+        q = f + 1;
+      } else {
+        pesos[q] = { divide: 1.5, residuos: 1.5, pare: 1, devolva: 1 }[t] ?? (accelerando ? 0.05 : 0.2);
+        q++;
+      }
+    }
+    const tl = linhaDoTempo(pesos);
+
+    // a dispersão: peso × potência; manual cheio, automático vazado
+    const PX0 = 78, PX1 = 420, PY0 = 104, PY1 = 360;
+    const xs = X.map((p) => p[0]), ys = X.map((p) => p[1]);
+    const lim = [[Math.min(...xs), Math.max(...xs)], [Math.min(...ys), Math.max(...ys)]].map(([a, b]) => [a - (b - a) * 0.06, b + (b - a) * 0.06]);
+    const PXv = (v) => PX0 + (v - lim[0][0]) / (lim[0][1] - lim[0][0]) * (PX1 - PX0);
+    const PYv = (v) => PY1 - (v - lim[1][0]) / (lim[1][1] - lim[1][0]) * (PY1 - PY0);
+    const fmt = (v, jj) => v.toLocaleString("pt-BR", { maximumFractionDigits: jj === 0 ? 2 : 1 });
+    const sinal = (v) => `${v < -1e-9 ? "−" : "+"}${Math.abs(v).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // a região de um nó: o retângulo que os cortes acima dele deixam
+    function regiao(a, id) {
+      const caixa = [[-Infinity, Infinity], [-Infinity, Infinity]];
+      const desce = (no, alvo) => {
+        if (no.id === alvo) return true;
+        if (no.folha) return false;
+        for (const [filho, lado] of [[no.esq, 1], [no.dir, 0]]) {
+          const antes = caixa[no.variavel].slice();
+          if (lado) caixa[no.variavel][1] = Math.min(caixa[no.variavel][1], no.corte); else caixa[no.variavel][0] = Math.max(caixa[no.variavel][0], no.corte);
+          if (desce(a[filho - 1], alvo)) return true;
+          caixa[no.variavel] = antes;
+        }
+        return false;
+      };
+      desce(a[0], id);
+      return caixa;
+    }
+    const naTela = (cx) => [[Math.max(cx[0][0], lim[0][0]), Math.min(cx[0][1], lim[0][1])], [Math.max(cx[1][0], lim[1][0]), Math.min(cx[1][1], lim[1][1])]];
+    // os cortes de uma árvore na dispersão, cada um só dentro da região do seu nó
+    function cortesNaTela(ctx, a, cor, larg) {
+      for (const no of a) {
+        if (no.folha) continue;
+        const cx = naTela(regiao(a, no.id));
+        if (no.variavel === 0) linha(ctx, PXv(no.corte), PYv(cx[1][0]), PXv(no.corte), PYv(cx[1][1]), cor, larg);
+        else linha(ctx, PXv(cx[0][0]), PYv(no.corte), PXv(cx[0][1]), PYv(no.corte), cor, larg);
+      }
+    }
+    // a árvore desenhada: folhas na ordem, cada nó na linha da sua profundidade
+    function posicoes(a) {
+      const P = {};
+      let folhas = 0;
+      const anda = (no, nivel) => {
+        if (no.folha) { P[no.id] = [folhas++, nivel]; return; }
+        anda(a[no.esq - 1], nivel + 1); anda(a[no.dir - 1], nivel + 1);
+        P[no.id] = [(P[no.esq][0] + P[no.dir][0]) / 2, nivel];
+      };
+      anda(a[0], 0);
+      return { P, folhas, fundo: Math.max(...Object.values(P).map((p) => p[1])) };
+    }
+
+    function desenhar(ctx, u) {
+      const k = tl.eventoEm(u), fim = u >= tl.total;
+      const st = k >= 0 ? est[k] : est[0];
+      const busca = !fim && st.cand;
+      // eixos da dispersão
+      linha(ctx, PX0, PY1, PX1, PY1, COR.palido); linha(ctx, PX0, PY0, PX0, PY1, COR.palido);
+      for (let v = Math.ceil(lim[0][0]); v <= lim[0][1]; v++) texto(ctx, String(v), PXv(v), PY1 + 6, 11, COR.cinza, 400, "center");
+      for (let v = 100; v <= lim[1][1]; v += 100) texto(ctx, String(v), PX0 - 8, PYv(v) - 7, 11, COR.cinza, 400, "right");
+      texto(ctx, `${nomes[0]} (mil libras)`, PX1, PY1 + 22, 11, COR.cinza, 400, "right");
+      texto(ctx, `${nomes[1]} (hp)`, PX0 + 6, PY0 - 18, 11, COR.cinza);
+      // a candidata da vez: a região dela, clara, e a varredura
+      if (busca) {
+        const a = st.cand[0] ? st.arvores[st.cand[0] - 1] : null;
+        const cx = naTela(a ? regiao(a, st.cand[1]) : [[-Infinity, Infinity], [-Infinity, Infinity]]);
+        ctx.fillStyle = COR.claro;
+        ctx.fillRect(PXv(cx[0][0]), PYv(cx[1][1]), PXv(cx[0][1]) - PXv(cx[0][0]), PYv(cx[1][0]) - PYv(cx[1][1]));
+        ctx.setLineDash([4, 3]); ctx.strokeStyle = COR.mexeu; ctx.lineWidth = 1.2;
+        ctx.strokeRect(PXv(cx[0][0]), PYv(cx[1][1]), PXv(cx[0][1]) - PXv(cx[0][0]), PYv(cx[1][0]) - PYv(cx[1][1])); ctx.setLineDash([]);
+        const risco = (jj, v, cor, larg, tracejado) => {
+          if (tracejado) ctx.setLineDash([5, 4]);
+          if (jj === 0) linha(ctx, PXv(v), PYv(cx[1][0]), PXv(v), PYv(cx[1][1]), cor, larg);
+          else linha(ctx, PXv(cx[0][0]), PYv(v), PXv(cx[0][1]), PYv(v), cor, larg);
+          ctx.setLineDash([]);
+        };
+        if (st.melhorCorte) risco(st.melhorCorte[0], st.melhorCorte[1], COR.tinta, 1.5, true);
+        if (st.i !== null) risco(st.varrendo, X[st.i][st.varrendo], COR.mexeu, 2);
+        if (st.corte) risco(st.corte[0], st.corte[1], COR.mexeu, 1.5, true);
+      }
+      // os cortes que já entraram, na cor da árvore de cada um
+      st.arvores.forEach((a, t) => cortesNaTela(ctx, a, CORES[t % CORES.length], !fim && st.ultima && st.ultima[0] === t + 1 && st.t === "divide" ? 3 : 2));
+      // os carros
+      X.forEach((p, q) => {
+        const vez = busca && q === st.i;
+        ctx.beginPath(); ctx.arc(PXv(p[0]), PYv(p[1]), vez ? 5.5 : 4, 0, 7);
+        if (y[q]) { ctx.fillStyle = vez ? COR.mexeu : COR.tinta; ctx.fill(); }
+        else { ctx.fillStyle = "#fff"; ctx.fill(); ctx.strokeStyle = vez ? COR.mexeu : COR.tinta; ctx.lineWidth = 1.5; ctx.stroke(); }
+      });
+      // os resíduos: uma barra por carro, na ordem do peso; o que ainda falta explicar
+      const RY = 432, RH = 32, ordem = X.map((_, q) => q).sort((p, q) => X[p][0] - X[q][0]), bw = (PX1 - PX0) / N;
+      linha(ctx, PX0, RY, PX1, RY, COR.palido);
+      ordem.forEach((q, pos) => {
+        const v = st.res[q], h = Math.max(-1, Math.min(1, v)) * RH;
+        ctx.fillStyle = busca && q === st.i ? COR.mexeu : COR.tinta;
+        ctx.fillRect(PX0 + pos * bw + bw * 0.15, h > 0 ? RY - h : RY, bw * 0.7, Math.abs(h));
+      });
+      const erro = st.res.reduce((sm, v) => sm + v * v, 0);
+      texto(ctx, "resíduos, um por carro, do mais leve ao mais pesado", PX0, RY + RH + 6, 11, COR.cinza);
+      texto(ctx, `soma dos quadrados: ${num(erro, 2)}`, PX0, RY + RH + 21, 11, COR.cinza);
+
+      // as árvores somadas, lado a lado (e em mais de uma linha quando não cabem), e a raiz de uma
+      // árvore nova esperando a vez
+      const TX0 = 470, TX1 = 940, TY0 = 104, gap = 22, fw = 56, dy = 42;
+      const vistas = st.arvores.map(posicoes);
+      const abre = maxArvores === null || st.arvores.length < maxArvores;   // a raiz de uma árvore nova ainda disputa
+      let x0 = TX0, y0 = TY0, fundoLinha = 0;
+      const lugar = (largura, fundo) => {
+        if (x0 > TX0 && x0 + largura > TX1) { y0 += fundoLinha * dy + 58; x0 = TX0; fundoLinha = 0; }
+        fundoLinha = Math.max(fundoLinha, fundo);
+      };
+      vistas.forEach((v, t) => {
+        const a = st.arvores[t], cor = CORES[t % CORES.length];
+        lugar(v.folhas * fw, v.fundo);
+        texto(ctx, `árvore ${t + 1}`, x0, y0 - 18, 11, cor, 600);
+        const pos = (id) => [x0 + (v.P[id][0] + 0.5) * fw, y0 + 12 + v.P[id][1] * dy];
+        for (const no of a) if (!no.folha) for (const f of [no.esq, no.dir]) { const [ax, ay] = pos(no.id), [bx, by] = pos(f); linha(ctx, ax, ay + 12, bx, by - 9, COR.palido, 1.2); }
+        for (const no of a) {
+          const [cx, cy] = pos(no.id);
+          const daVez = busca && st.cand[0] === t + 1 && st.cand[1] === no.id;
+          if (no.folha) {
+            ctx.fillStyle = daVez ? COR.mexeu : "#fff"; ctx.strokeStyle = daVez ? COR.mexeu : cor; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.rect(cx - fw / 2 + 4, cy - 9, fw - 8, 18); ctx.fill(); ctx.stroke();
+            texto(ctx, sinal(no.valor), cx, cy - 6, 10, daVez ? "#fff" : COR.tinta, 600, "center");
+          } else {   // a variável em cima e o corte embaixo: os rótulos de dois nós vizinhos não se encostam
+            const novo = !fim && st.t === "divide" && st.ultima[0] === t + 1 && st.ultima[1] === no.id;
+            texto(ctx, nomes[no.variavel], cx, cy - 12, 10, novo ? COR.mexeu : COR.tinta, 600, "center");
+            texto(ctx, `≤ ${fmt(no.corte, no.variavel)}`, cx, cy, 10, novo ? COR.mexeu : COR.tinta, 600, "center");
+          }
+        }
+        x0 += v.folhas * fw + gap;
+        if (t < vistas.length - 1 || abre) texto(ctx, "+", x0 - gap / 2, y0 + 2, 16, COR.cinza, 600, "center");
+      });
+      if (abre) {
+        lugar(fw, 0);
+        const daVez = busca && st.cand[0] === 0;
+        ctx.setLineDash([4, 3]); ctx.strokeStyle = daVez ? COR.mexeu : COR.aux; ctx.lineWidth = 1.5;
+        ctx.strokeRect(x0 + 4, y0 + 3, fw - 8, 18); ctx.setLineDash([]);
+        texto(ctx, "nova", x0 + fw / 2, y0 - 18, 11, daVez ? COR.mexeu : COR.cinza, 600, "center");
+      }
+      // os números, logo abaixo das árvores
+      const py = Math.min(420, Math.max(320, y0 + fundoLinha * dy + 44));
+      const acertos = X.filter((p, q) => Algoritmos.classeFigs(Algoritmos.preverFigs(st.arvores, p)) === y[q]).length;
+      texto(ctx, "resíduos somados", TX0, py, 13, COR.cinza);
+      texto(ctx, milhar(st.somas), TX0, py + 16, 30, COR.tinta, 700);
+      texto(ctx, "cortes testados", TX0 + 170, py, 13, COR.cinza);
+      texto(ctx, milhar(st.cortes), TX0 + 170, py + 16, 30, COR.tinta, 700);
+      texto(ctx, "acertos", TX0 + 330, py, 13, COR.cinza);
+      texto(ctx, st.arvores.length ? `${acertos} de ${N}` : "—", TX0 + 330, py + 16, 30, fim ? COR.verde : COR.tinta, 700);
+      const div = st.arvores.reduce((sm, a) => sm + (a.length - 1) / 2, 0);
+      texto(ctx, `passo ${Math.min(st.passo, s)} de ${s}   ${div} ${div === 1 ? "divisão" : "divisões"} em ${st.arvores.length} ${st.arvores.length === 1 ? "árvore" : "árvores"}`, TX0, py + 58, 13, COR.cinza);
+      legendaCores(ctx, [[COR.tinta, "manual"], ["#fff", "automático", COR.tinta, 1.5], [COR.claro, "a candidata da vez", COR.mexeu], [COR.mexeu, "o carro somado agora"]], 504);
+
+      if (fim) legenda(ctx, [[`${r.arvores.length} ${r.arvores.length === 1 ? "árvore" : "árvores"}, ${r.divisoes} ${r.divisoes === 1 ? "divisão" : "divisões"}: `, ""], [`${r.acertos} de ${N} carros certos`, "g"]]);
+      else legenda(ctx, [[ideia[st.arvores.length ? 1 : 0], ""]]);
+    }
+
+    const contagemEm = (u) => { const k = tl.eventoEm(u); return k >= 0 ? est[k].somas : 0; };
+    return {
+      total: tl.total, desenhar, ...comum(tl, est, pesos, RITMO.figs, accelerando),
+      resumo: { somas: r.somas, cortes: r.cortes, acertos: r.acertos, n: N, pico: r.pico }, contagemEm,
+      medidor: () => `${milhar(r.somas)} resíduos somados, n = ${N}<br>${r.acertos} de ${N} certos`,
+      aoVivo: (u, cfg) => `Tocando agora: ${cfg.rotulo}, ${N} carros, até ${s} divisões; ${milhar(contagemEm(u))} de ${milhar(r.somas)} resíduos somados, ${r.arvores.length} ${r.arvores.length === 1 ? "árvore" : "árvores"} e ${r.acertos} de ${N} carros certos no fim.`,
+    };
+  }
+
   function criar(faixa, cfg, accelerando = false) {
     const tipo = faixa.medido.tempo.tipo, ex = faixa.exemplo, padrao = cfg.tipo === "padrao";
     if (tipo === "busca") {
@@ -2667,6 +2871,7 @@
       const d = { padrao: 0, d6: 1e6, d8: 1e8, d9: 1e9 }[cfg.tipo];
       return simWelford(faixa, ex.x.map((v) => v + d), ex.anos, ex.menu.find((m) => m.deslocamento === d), accelerando);
     }
+    if (tipo === "figs") return simFigs(faixa, ex.X, ex.y, cfg.k || ex.s, cfg.tipo === "uma" ? 1 : null, accelerando);
     if (tipo === "histograma") return simHistograma(faixa, padrao ? ex.x : Algoritmos.amostra(cfg.n, cfg.tipo, cfg.semente), accelerando);
     if (tipo === "palavras") return simPalavras(faixa, padrao ? ex.palavras : ex.palavras.slice(0, cfg.n), accelerando);
     if (tipo === "repetidos") return simRepetidos(faixa, padrao ? ex.vetor : Algoritmos.valoresRepetidos(cfg.n, cfg.tipo, cfg.semente), accelerando);

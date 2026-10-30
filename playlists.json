@@ -100,6 +100,17 @@
   ]
  },
  {
+  "id": "classificar-um-exemplo",
+  "bloco": "Aprender com exemplos",
+  "titulo": "Classificar um exemplo",
+  "cor": "laranja",
+  "codigo": "CE",
+  "frase": "Olhar um exemplo e dizer de que classe ele é, com uma regra aprendida de exemplos que já vêm com a resposta.",
+  "subcategorias": [
+   {"titulo": "somando árvores pequenas", "faixas": ["figs"]}
+  ]
+ },
+ {
   "id": "problemas-gerais",
   "bloco": "Problemas gerais",
   "titulo": "Problemas gerais",

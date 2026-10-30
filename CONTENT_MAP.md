@@ -11,6 +11,7 @@ A reorganização e a Fase 1 dos QAs estão implementadas no branch `claude/mapa
 - As playlists, a galeria Problemas gerais e Algoritmos e estruturas estão no código: `playlists.json` e `galeria.js`. A home é só prateleiras, como a do Spotify.
 - **Conceitos importantes está ligada (28/10):** os 7 vídeos narrados (CI-00 a CI-06, 29 a 85 s, 20,8 MB em `videos/`) tocam no palco, com "a seguir" entre um e outro, velocidade e pause. Sem legenda: o Pedro preferiu os vídeos sem ela (28/10), e o `<track>`, o botão CC e os `.vtt` saíram. A seção abre a home, antes dos blocos de playlists. Cada vídeo só é baixado quando toca.
 - **Fundamentos está completa (29/10):** os 11 vídeos (FU-01 a FU-11, de 1:09 a 2:03, uns 47 MB em `videos/`), narrados com a mesma voz de Conceitos, sem legenda, tocando em sequência até "fim de Fundamentos". Os briefings estão em `docs/fundamentos-briefings.md`.
+- **Aprender com exemplos, a playlist de vídeo (30/10):** a terceira série de vídeos (`classificar.json`, `window.CLASSIFICAR`), no molde de Conceitos e Fundamentos, com os vídeos das faixas de Classificar um exemplo, com o CE-01 · FIGS (1:26, narrado com a mesma voz, sem legenda, `videos/classificar-1.mp4`). Fica na home depois de Fundamentos, com a capa provisória laranja até a CE-01 desenhada. Decisão do Pedro: série nova, e não vídeo dentro da página da faixa, com o nome "Aprender com exemplos" para não repetir o da playlist de faixas. O projeto do vídeo é o `bonijoao/big-o-player-videos`.
 - **Fundamentos**, antes (`fundamentos.json`), era playlist de vídeo pronta no código e **desligada**: cada uma só aparece quando algum vídeo ganha `"video"` (o caminho do arquivo). Sem vídeo, a vitrine não mostra cartão vazio nem "em breve".
 - O "Comece por aqui" saiu. Instrumento virou estrutura (`#estruturas/<nome>`), e os links antigos (`#busca/…`, `#instrumentos/…`, `#k-means`) redirecionam.
 - Os 11 vídeos de Fundamentos têm a lista aprovada e ainda não têm roteiro.
@@ -63,13 +64,14 @@ A home abre com "Algoritmos tocando ao vivo." e "Cada playlist é um problema; c
 | Organizar uma fila | amarelo | OF |
 | Percorrer tudo | verde-escuro (a cor da capa, não o verde do resultado) | PT |
 | Achar o caminho mais curto | roxo | CC |
+| Classificar um exemplo | laranja (`#ec7a2c`, com o texto em tinta: 5,9:1) | CE |
 | Problemas gerais | neutro (a cor da lateral); cada linha leva a cor da própria capa na marca da subcategoria e no equalizador | PG |
 
 ## As quatro seções, nesta ordem
 
 1. **Conceitos importantes**: 7 vídeos novos, com o vídeo 0 apresentando o site. É a porta de entrada e termina onde começa o primeiro algoritmo. Os roteiros estão prontos: o Pedro grava o áudio primeiro, e a animação vem por cima.
 2. **Fundamentos**: a playlist inicial de vídeos curtos sobre a base (variável, laço, vetor, pilha, n, passo…), que deixa a pessoa pronta para ver qualquer faixa.
-3. **Playlists por problema**: 7 playlists com 24 faixas, e as variações ficam como subcategorias.
+3. **Playlists por problema**: 8 playlists com 25 faixas, e as variações ficam como subcategorias.
    - Encontrar um item
    - Ordenar uma lista
    - Contar ocorrências
@@ -77,9 +79,10 @@ A home abre com "Algoritmos tocando ao vivo." e "Cada playlist é um problema; c
    - Organizar uma fila
    - Percorrer tudo
    - Achar o caminho mais curto
+   - Classificar um exemplo (issue #1; por enquanto só com o FIGS, que é a primeira faixa)
 
    Os problemas com uma faixa só vão para a galeria **Problemas gerais**, que tem 10 faixas, uma por problema e no fim das playlists. Quando um desses problemas ganha a segunda faixa, ele sai da galeria e vira playlist.
-4. **Algoritmos e estruturas**: as páginas interativas de hoje, isto é, as 11 estruturas (os antigos "instrumentos") e a página de cada uma das 34 faixas.
+4. **Algoritmos e estruturas**: as páginas interativas de hoje, isto é, as 11 estruturas (os antigos "instrumentos") e a página de cada uma das 35 faixas.
 
 Status usados na tabela:
 - **no ar**: fica onde está.
@@ -127,6 +130,7 @@ O id entre crases é o nome da pasta em `algoritmos/` ou `instrumentos/`.
 | Playlists | Percorrer tudo | num grafo | Busca em largura (`largura`) | mudou de lugar (Grafos) | A mesma faixa de Achar o caminho mais curto: visita em ondas, com uma fila. | nova |
 | Playlists | Achar o caminho mais curto | sem custo nas ligações | Busca em largura (`largura`) | mudou de lugar (Grafos) | Anda em ondas a partir da origem: o caminho com menos passos. | nova |
 | Playlists | Achar o caminho mais curto | com custo nas ligações | Dijkstra (`dijkstra`) | mudou de lugar (Grafos) | Expande sempre o ponto mais perto, com um heap. | nova |
+| Playlists | Classificar um exemplo | somando árvores pequenas | FIGS (`figs`) | feito | Várias árvores rasas que crescem juntas; a previsão é a soma delas. Conferido contra o `figsr`. | provisória (CE-01) |
 | Playlists | Problemas gerais | achar o maior | Máximo de um vetor (`maximo`) | mudou de lugar (Primeiros passos) | Sempre n − 1 comparações, e nenhum algoritmo faz menos. | nova |
 | Playlists | Problemas gerais | achar o maior de cada trecho | Máximo em janela deslizante (`janela`) | mudou de lugar (Estruturas lineares) | O maior de cada trecho de k casas: com um deque, n passos; ingênuo, n·k. | nova |
 | Playlists | Problemas gerais | achar o valor do meio | Mediana por quickselect (`mediana`) | mudou de lugar (Estatística) | Acha o valor do meio sem ordenar o vetor inteiro, em n passos na média. | nova |
@@ -148,6 +152,7 @@ O id entre crases é o nome da pasta em `algoritmos/` ou `instrumentos/`.
 | Fundamentos | — | — | 9. Dicionário | feito (narrado) | Achar pela chave calculando a casa, em vez de procurar; e quando duas chaves colidem. | nova |
 | Fundamentos | — | — | 10. n, passo e memória | feito (narrado) | O que se conta neste site: o tamanho da entrada, as operações básicas e o que se guarda além da entrada e da resposta. | nova |
 | Fundamentos | — | — | 11. Ler o gráfico log-log | feito (narrado) | Com os dois eixos em log, a inclinação da reta é o expoente. | nova |
+| Aprender com exemplos | — | — | 1. FIGS | feito (narrado) | Árvores rasas que crescem juntas, um corte por vez; a previsão é a soma de uma folha de cada. | provisória (CE-01) |
 | Algoritmos e estruturas | — | estruturas | Vetor (`vetor`) | mudou de lugar (Instrumentos) | Valores em sequência; chega a qualquer um pelo número da casa. | — |
 | Algoritmos e estruturas | — | estruturas | Matriz (`matriz`) | mudou de lugar (Instrumentos) | Uma tabela por linha e coluna, guardada linha a linha num bloco só. | — |
 | Algoritmos e estruturas | — | estruturas | Texto (`texto`) | mudou de lugar (Instrumentos) | Um vetor de letras: concatenar no laço × juntar no fim. | — |
@@ -159,9 +164,11 @@ O id entre crases é o nome da pasta em `algoritmos/` ou `instrumentos/`.
 | Algoritmos e estruturas | — | estruturas | Árvore de busca (`arvore`) | mudou de lugar (Instrumentos) | Guarda em ordem e acha descendo poucos níveis: comum × AVL. | — |
 | Algoritmos e estruturas | — | estruturas | Heap (`heap`) | mudou de lugar (Instrumentos) | Tira sempre o menor sem ordenar tudo: árvore e vetor ao mesmo tempo. | — |
 | Algoritmos e estruturas | — | estruturas | Dicionário (`dicionario`) | mudou de lugar (Instrumentos) | Acha o valor pela chave quase sem procurar: encadeamento × sondagem. | — |
-| Algoritmos e estruturas | — | algoritmos | as 34 faixas | no ar | A página de cada faixa (encarte, palco, gráficos) é a mesma; a playlist só aponta para ela. | a da faixa |
+| Algoritmos e estruturas | — | algoritmos | as 35 faixas | no ar | A página de cada faixa (encarte, palco, gráficos) é a mesma; a playlist só aponta para ela. | a da faixa |
 
-Conferência: 24 faixas nas 7 playlists (a Busca em largura aparece em duas) + 10 em Problemas gerais = 34; 11 estruturas.
+Conferência: 25 faixas nas 8 playlists (a Busca em largura aparece em duas) + 10 em Problemas gerais = 35; 11 estruturas.
+
+**Classificar um exemplo (29/10, issue #1):** a playlist é o problema "classificar" (dado um exemplo, decidir a que classe ele pertence), no bloco novo "Aprender com exemplos", antes de Problemas gerais. Fica como playlist, e não em Problemas gerais, porque a issue pede a playlist com o FIGS como primeira faixa e os outros algoritmos de classificação depois. O FIGS roda sobre o câmbio dos 32 carros do `mtcars`, e o palco compara com a árvore única. A cor é o laranja, que nenhuma playlist usava; a capa CE-01 e a da playlist estão por fazer, com os prompts em `docs/capas-classificacao.md`.
 
 ### Capas
 
