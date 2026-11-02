@@ -200,6 +200,66 @@
     c.sai();
   }
 
+  // ---------- Fractran sort (como algoritmos/fractran/fractran.py) ----------
+
+  const PEQUENOS = "₀₁₂₃₄₅₆₇₈₉";
+  const pequeno = (k) => String(k).replace(/\d/g, (d) => PEQUENOS[d]);
+
+  /** Os registradores (nome e primo) e as 4n frações, na ordem do programa. */
+  function fractranPrograma(n) {
+    const nomes = [], casa = {};
+    const novo = (letra, k) => { casa[letra + k] = nomes.length; nomes.push(letra + pequeno(k)); };
+    for (let i = 1; i <= n; i++) novo("p", i);
+    for (let j = 1; j <= n; j++) novo("q", j);
+    for (let i = 1; i <= n + 1; i++) novo("s", i);
+    for (let r = 0; r <= n; r++) novo("m", r);
+    casa.t = nomes.length; nomes.push("τ");
+    const primos = [];
+    for (let x = 2; primos.length < nomes.length; x++) if (primos.every((d) => x % d)) primos.push(x);
+    const F = [];
+    const fracao = (bloco, num, den) => F.push({ bloco, num: num.map((c) => casa[c]), den: den.map((c) => casa[c]) });
+    for (let r = n; r >= 1; r--) fracao(0, [`m${r - 1}`, `q${r}`], ["t", `m${r}`]);
+    for (let i = 1; i <= n; i++) {
+      fracao(1, [`s${i + 1}`, "t"], [`s${i}`, `p${i}`]);
+      fracao(1, [`s${i + 1}`], [`s${i}`]);
+    }
+    for (let r = 0; r < n; r++) fracao(2, ["s1", `m${n}`], [`s${n + 1}`, `m${r}`]);
+    return { nomes, primos, F, casa, inicio: (v) => {
+      const e = new Array(nomes.length).fill(0);
+      e[casa.s1] = e[casa[`m${n}`]] = 1;
+      v.forEach((x, i) => { e[casa[`p${i + 1}`]] = x; });
+      return e;
+    } };
+  }
+
+  function fractran(v, c) {
+    const n = v.length, { nomes, F, casa, inicio } = fractranPrograma(n), e = inicio(v);
+    c.aloca("programa", F.length);
+    c.aloca("expoentes", nomes.length);
+    const V = c.vars = { f: null };
+    let achou = true, testes = 0;
+    while (achou) {
+      achou = false;
+      testes = 0;
+      for (let f = 0; f < F.length; f++) {
+        c.op("comparacoes");
+        testes++;
+        if (F[f].den.every((x) => e[x] > 0)) {
+          F[f].den.forEach((x) => { e[x]--; });
+          F[f].num.forEach((x) => { e[x]++; });
+          c.op("passos");
+          V.f = f + 1;
+          c.push({ t: "aplica", f, testes, linha: 9 });
+          achou = true;
+          break;
+        }
+      }
+    }
+    V.f = null;
+    c.push({ t: "devolva", testes, linha: 12 });
+    for (let j = 0; j < n; j++) v[j] = e[casa[`q${j + 1}`]];
+  }
+
   const ORDENACOES = {
     bolha: { movimento: "trocas", ordenar: (v, c) => bolha(v, c) },
     insercao: { movimento: "trocas", ordenar: (v, c) => insercao(v, c) },
@@ -214,6 +274,7 @@
     },
     rapida: { movimento: "trocas", ordenar: (v, c) => rapida(v, 0, v.length, c, 1) },
     heapsort: { movimento: "trocas", ordenar: (v, c) => heapsort(v, c) },
+    fractran: { movimento: "passos", ordenar: (v, c) => fractran(v, c) },
   };
 
   /** Roda uma ordenação numa cópia de `vetor` e devolve contagens e eventos. */
@@ -1731,7 +1792,7 @@
     return { texto: base(n), padrao: base(m) };
   }
 
-  const api = { ordenar, kmeans, figs, preverFigs, classeFigs, buscar, parenteses, atendimento, inverter, janela, janelaIngenua, percursos, buscaArvore, avl, valoresArvore, largura, profundidade, mediana, welford, somaDosQuadrados, duasPassadas,
+  const api = { ordenar, fractranPrograma, kmeans, figs, preverFigs, classeFigs, buscar, parenteses, atendimento, inverter, janela, janelaIngenua, percursos, buscaArvore, avl, valoresArvore, largura, profundidade, mediana, welford, somaDosQuadrados, duasPassadas,
     histograma, pretty, sturges, prioridade, dijkstra, entrada, valoresSorteados, entradaBusca, textoParenteses, clientes, pacientes, grafoGrade, pesosGrade,
     centrosIniciais, amostra, palavras, repetidos, repetidosVetor, encadeamento, sondagem, valoresRepetidos, chavesColisao, ORDENACOES,
     maximo, multiplicacao, fatorial, fibRecursivo, fibMemoria, fibIterativo, padrao, matrizesSorteadas, textoPadrao };

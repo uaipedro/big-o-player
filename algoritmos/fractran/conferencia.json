@@ -1,0 +1,7 @@
+{
+  "referencia": "fractran_r() (reimplementação em R) e sort()",
+  "versao_r": "4.6.0",
+  "vetores": 15,
+  "tudo_ok": true,
+  "resumo": "Reescrito em R 4.6.0 e rodado em 15 vetores (de 1 a 24 números, com repetidos e zeros): a ordem final bate com sort(), as frações testadas e os passos batem um a um com o Python, e os passos batem com (M + 1)(n + 1) + soma − 1."
+}

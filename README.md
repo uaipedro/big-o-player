@@ -133,6 +133,10 @@ Cada faixa usa um conjunto embutido no R, exportado para CSV por um script na pr
 
 Essas faixas, e as buscas, descrevem os próprios casos de entrada no `dados.json` (`tempo.series`, `tempo.banda`, `tempo.refs`, `tempo.eixo`); o encarte desenha os gráficos a partir disso, e as legendas vêm de `graficos` na ficha, com os números preenchidos dos dados (`{n0}`, `{min}`, …). O menu de entrada de cada tipo de faixa fica em `ENTRADAS`, no `galeria.js`.
 
+## A faixa do Fractran sort
+
+- **Fractran sort** (`algoritmos/fractran/`): um programa FRACTRAN de 4n frações que ordena inteiros não negativos, com toda a memória em N. As contagens rodam nos expoentes, e o `medir.py` confere em 788 vetores pequenos que os inteiros de verdade dão o mesmo N e as mesmas contagens, e que os passos batem com (M + 1)(n + 1) + soma − 1. O tempo conta as frações testadas, para n até 64 e, com n = 16, para o maior número M até 64. O palco mostra as contas de p caindo em q, as setas s e m, a lista de frações e o N inteiro, com um `BigInt` que tem de dividir certinho a cada passo.
+
 ## A faixa de Classificar um exemplo
 
 - **FIGS** (`algoritmos/figs/`): várias árvores pequenas somadas, como o `figs()` do pacote `figsr` (classificação com duas classes, `min_n = 5`), sobre o câmbio dos 32 carros do `mtcars` pelo peso e pela potência (`mtcars.R` exporta o CSV). O tempo conta os resíduos somados na varredura de cada variável (`somas`); os cortes avaliados vão à parte (`cortes`). A régua é a soma, e não o corte, porque o figsr testa no máximo 30 cortes por variável: os cortes param de crescer com n, e a varredura não. O menu do palco troca o FIGS pela árvore única (o mesmo código com uma árvore só) e o s, as divisões. O `conferir.R` monta as mesmas árvores no figsr e confere cortes, folhas e previsões em 27 ajustes. A faixa ainda não tem `video.py`: o pôster saiu do site, e a capa provisória fica até a capa desenhada (`docs/capas-classificacao.md`).

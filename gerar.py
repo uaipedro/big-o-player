@@ -21,7 +21,7 @@ RAIZ = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(RAIZ, "motor"))
 import pseudocodigo  # noqa: E402
 ALGORITMOS = ["maximo", "multiplicacao", "fatorial", "fibrecursivo", "fibmemoria", "fibiterativo", "padrao",
-              "sequencial", "binaria", "bolha", "insercao", "selecao", "intercalacao", "rapida", "heapsort",
+              "sequencial", "binaria", "bolha", "insercao", "selecao", "intercalacao", "rapida", "heapsort", "fractran",
               "parenteses", "atendimento", "inverter", "janela", "percursos", "abb", "avl", "prioridade", "largura", "profundidade", "dijkstra",
               "palavras", "repetidos", "encadeamento", "sondagem", "welford", "mediana", "histograma", "kmeans", "figs"]   # a ordem das medições; a das faixas vem do playlists.json
 INSTRUMENTOS = ["vetor", "matriz", "texto", "pilha", "fila", "deque", "lista", "grafo", "arvore", "heap", "dicionario"]

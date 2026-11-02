@@ -71,7 +71,7 @@ A home abre com "Algoritmos tocando ao vivo." e "Cada playlist é um problema; c
 
 1. **Conceitos importantes**: 7 vídeos novos, com o vídeo 0 apresentando o site. É a porta de entrada e termina onde começa o primeiro algoritmo. Os roteiros estão prontos: o Pedro grava o áudio primeiro, e a animação vem por cima.
 2. **Fundamentos**: a playlist inicial de vídeos curtos sobre a base (variável, laço, vetor, pilha, n, passo…), que deixa a pessoa pronta para ver qualquer faixa.
-3. **Playlists por problema**: 8 playlists com 25 faixas, e as variações ficam como subcategorias.
+3. **Playlists por problema**: 8 playlists com 26 faixas, e as variações ficam como subcategorias.
    - Encontrar um item
    - Ordenar uma lista
    - Contar ocorrências
@@ -82,7 +82,7 @@ A home abre com "Algoritmos tocando ao vivo." e "Cada playlist é um problema; c
    - Classificar um exemplo (issue #1; por enquanto só com o FIGS, que é a primeira faixa)
 
    Os problemas com uma faixa só vão para a galeria **Problemas gerais**, que tem 10 faixas, uma por problema e no fim das playlists. Quando um desses problemas ganha a segunda faixa, ele sai da galeria e vira playlist.
-4. **Algoritmos e estruturas**: as páginas interativas de hoje, isto é, as 11 estruturas (os antigos "instrumentos") e a página de cada uma das 35 faixas.
+4. **Algoritmos e estruturas**: as páginas interativas de hoje, isto é, as 11 estruturas (os antigos "instrumentos") e a página de cada uma das 36 faixas.
 
 Status usados na tabela:
 - **no ar**: fica onde está.
@@ -117,6 +117,7 @@ O id entre crases é o nome da pasta em `algoritmos/` ou `instrumentos/`.
 | Playlists | Ordenar uma lista | dividir e juntar, O(n log n) | Merge sort (`intercalacao`) | mudou de lugar (Ordenação) | Divide ao meio, ordena as metades e intercala. | nova |
 | Playlists | Ordenar uma lista | dividir e juntar, O(n log n) | Quick sort (`rapida`) | mudou de lugar (Ordenação) | Separa menores e maiores em volta de um pivô; n² no pior caso. | nova |
 | Playlists | Ordenar uma lista | com um heap | Heapsort (`heapsort`) | mudou de lugar (Ordenação) | Monta um heap no próprio vetor e tira sempre o maior. | nova |
+| Playlists | Ordenar uma lista | só com frações, sem comparar | Fractran sort (`fractran`) | feito | Um programa FRACTRAN de 4n frações: tudo mora em N, e a ordem da entrada não muda a conta. | provisória (OL-07) |
 | Playlists | Contar ocorrências | por palavra | Contar palavras (`palavras`) | mudou de lugar (Dispersão) | Um dicionário com uma contagem por palavra, numa leitura só do texto. | nova |
 | Playlists | Contar ocorrências | por faixa de valores | Histograma (`histograma`) | mudou de lugar (Estatística) | Conta quantos valores caem em cada classe, para ver a forma dos dados. | nova |
 | Playlists | Contar ocorrências | já apareceu? | Achar repetidos (`repetidos`) | mudou de lugar (Dispersão) | Vetor × dicionário: n² comparações contra n consultas. | nova |
@@ -164,9 +165,11 @@ O id entre crases é o nome da pasta em `algoritmos/` ou `instrumentos/`.
 | Algoritmos e estruturas | — | estruturas | Árvore de busca (`arvore`) | mudou de lugar (Instrumentos) | Guarda em ordem e acha descendo poucos níveis: comum × AVL. | — |
 | Algoritmos e estruturas | — | estruturas | Heap (`heap`) | mudou de lugar (Instrumentos) | Tira sempre o menor sem ordenar tudo: árvore e vetor ao mesmo tempo. | — |
 | Algoritmos e estruturas | — | estruturas | Dicionário (`dicionario`) | mudou de lugar (Instrumentos) | Acha o valor pela chave quase sem procurar: encadeamento × sondagem. | — |
-| Algoritmos e estruturas | — | algoritmos | as 35 faixas | no ar | A página de cada faixa (encarte, palco, gráficos) é a mesma; a playlist só aponta para ela. | a da faixa |
+| Algoritmos e estruturas | — | algoritmos | as 36 faixas | no ar | A página de cada faixa (encarte, palco, gráficos) é a mesma; a playlist só aponta para ela. | a da faixa |
 
-Conferência: 25 faixas nas 8 playlists (a Busca em largura aparece em duas) + 10 em Problemas gerais = 35; 11 estruturas.
+Conferência: 26 faixas nas 8 playlists (a Busca em largura aparece em duas) + 10 em Problemas gerais = 36; 11 estruturas.
+
+**Fractran sort (01/11):** veio de um rascunho que o Reinaldo mandou por e-mail, com seis algoritmos de ordenação em FRACTRAN. A faixa usa o ábaco de 4n frações, o único dos seis que aceita qualquer n sem o programa explodir (o Ferrers–Young precisa de 2ⁿ − 1 frações). Fica no fim de Ordenar uma lista, em subcategoria própria. A página afirma só o que o código confere: a ordem, os passos pela fórmula e as frações testadas, em Python, R e JS. As provas de mínimo e o "inédito" do rascunho ficam de fora até alguém de fora revisar. Sem capa desenhada e sem `video.py`.
 
 **Classificar um exemplo (29/10, issue #1):** a playlist é o problema "classificar" (dado um exemplo, decidir a que classe ele pertence), no bloco novo "Aprender com exemplos", antes de Problemas gerais. Fica como playlist, e não em Problemas gerais, porque a issue pede a playlist com o FIGS como primeira faixa e os outros algoritmos de classificação depois. O FIGS roda sobre o câmbio dos 32 carros do `mtcars`, e o palco compara com a árvore única. A cor é o laranja, que nenhuma playlist usava; a capa CE-01 e a da playlist estão por fazer, com os prompts em `docs/capas-classificacao.md`.
 

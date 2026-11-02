@@ -1,0 +1,48 @@
+{
+ "id": "fractran-sort",
+ "nome": "Fractran sort",
+ "objetivo": "Pôr o vetor em ordem sem comparar ninguém: o programa é uma lista de frações, e toda a memória cabe num número só.",
+ "variante": "ábaco de 4n frações (Pointer-Abacus), para inteiros não negativos",
+ "familia": "ordenação",
+ "resumo": "Cada número do vetor vira expoente de um primo, e tudo fica guardado em N. O programa só sabe uma coisa: achar a primeira fração que, vezes N, dá inteiro, e multiplicar. A seta s passa pelas colunas de p e tira uma conta de cada uma que tem. Cada conta tirada cai em q, onde a seta m aponta, da direita pra esquerda. Camada por camada, q sai em ordem.",
+ "instrumentos": [
+  {
+   "id": "vetor",
+   "papel": "a entrada e a saída; lá dentro, cada posição vira o expoente de um primo em N"
+  }
+ ],
+ "tempo": {
+  "notacao": "O(n²·M)",
+  "porque": "M é o maior número do vetor. São M + 1 camadas, cada uma com n + 1 passos e mais um passo por conta movida: (M + 1)(n + 1) + soma − 1 passos ao todo. E cada passo testa as frações do começo da lista até achar a que serve, entre 4n. Nos vetores de 0 a n − 1, M cresce junto com n, e a conta vira n³.",
+  "nota": "A ordem da entrada não muda nada: embaralhado, ordenado ou invertido, dá a mesma conta, até a última fração. Quem manda é o tamanho dos números. Só funciona com inteiro não negativo, e as contas não têm dono: sai a lista em ordem, sem dizer quem estava em cada lugar."
+ },
+ "memoria": {
+  "notacao": "O(n)",
+  "porque": "As 4n frações do programa e 4n + 3 expoentes. Na conta de verdade, os expoentes moram todos em N, que é um número só: as casas não aumentam, mas N ganha dígitos conforme os números do vetor crescem.",
+  "nomes": {
+   "expoentes": "expoentes dos primos de N",
+   "programa": "frações do programa"
+  },
+  "cresce_com_n": [
+   "expoentes",
+   "programa"
+  ]
+ },
+ "video": {
+  "ideia": [
+   "cada passo multiplica N pela primeira fração que dá inteiro",
+   "a cada camada, uma conta de cada p cai em q, da direita pra esquerda"
+  ]
+ },
+ "graficos": {
+  "titulo": "Tempo: o que cresce, e o que não faz diferença",
+  "texto": "As mesmas contas para vetores cada vez maiores e para números cada vez maiores. A ordem da entrada fica de fora: as três linhas caem uma em cima da outra.",
+  "crescimento": "Frações testadas para n de {n0} a {n1}, com números de 0 a n − 1. {dados}. Dobrou o n, testa quase 8 vezes mais: é o n³.",
+  "por_k": "Frações testadas para o maior número M de {k0} a {k1}, com n = {nk}. Sorteio de números de 0 a M, com M garantido no vetor. Em escala logarítmica, o reto no fim é o custo subindo junto com M."
+ },
+ "pseudocodigo": "procedimento fractran_sort(v):\n    F ← as 4n frações, na ordem\n    N ← s₁ · mₙ · p₁^v[1] · p₂^v[2] · … · pₙ^v[n]\n    achou ← verdadeiro\n    enquanto achou:\n        achou ← falso\n        para f de 1 até 4n:\n            se F[f].den divide N:\n                N ← N · F[f].num / F[f].den\n                achou ← verdadeiro\n                pare\n    v ← os expoentes de q₁, q₂, …, qₙ\n",
+ "placa": {
+  "autor": "Rei Silva (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
+  "ano": "2026; FRACTRAN em 1987, bead sort em 2002"
+ }
+}

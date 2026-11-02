@@ -43,11 +43,12 @@
   "titulo": "Ordenar uma lista",
   "cor": "vermelho",
   "codigo": "OL",
-  "frase": "Pôr números em ordem. Na sequência, a playlist vai do O(n²) ao O(n log n).",
+  "frase": "Pôr números em ordem. Na sequência, a playlist vai do O(n²) ao O(n log n), e fecha com um jeito que nem compara: só frações.",
   "subcategorias": [
    {"titulo": "um por um, O(n²)", "faixas": ["bolha", "insercao", "selecao"]},
    {"titulo": "dividir e juntar, O(n log n)", "faixas": ["intercalacao", "rapida"]},
-   {"titulo": "com um heap", "faixas": ["heapsort"]}
+   {"titulo": "com um heap", "faixas": ["heapsort"]},
+   {"titulo": "só com frações, sem comparar", "faixas": ["fractran"]}
   ]
  },
  {

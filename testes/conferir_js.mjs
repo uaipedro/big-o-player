@@ -46,7 +46,7 @@ function confereLinhas(pasta, eventos) {
     proximo: "passo", vira: "passo", tira: "passo", poe: "passo", maximo: "passo",
     busca: "decisao", dispersa: "passo", inicio: "passo", sonda: "decisao", liga: "passo",
     desce: "passo", novo: "passo", gira: "passo", girou: "passo", equilibra: "passo",
-    multiplica: ["passo", "chamada"], soma: ["passo", "chamada"], ganho: "passo", divide: "passo", residuos: "passo", marca: "passo", lembra: "passo", guarda: "passo", encosta: "laco" };   // o retorno volta à linha da chamada; rótulo: o teste "≠" ou a troca
+    multiplica: ["passo", "chamada"], soma: ["passo", "chamada"], ganho: "passo", divide: "passo", residuos: "passo", marca: "passo", lembra: "passo", guarda: "passo", encosta: "laco", aplica: "passo" };   // o retorno volta à linha da chamada; rótulo: o teste "≠" ou a troca
   let erros = 0;
   for (const e of eventos) {
     if (e.linha === undefined) continue;
@@ -76,6 +76,7 @@ function confereVars(pasta, vetor, eventos) {
     heapsort: (e) => (e.t !== "compara" || (e.linha === 14 ? e.vars.f === e.i + 1 && e.vars.p === e.j + 1 && e.vars["v[f]"] === v[e.i] && e.vars["v[p]"] === v[e.j]
       : e.vars.f === e.j + 1 && e.vars["v[f]"] === v[e.j] && e.i === e.j + 1 && e.i < e.vars.fim))
       && (e.t !== "troca" || e.linha !== 7 || (e.i === 0 && e.j === e.vars.fim - 1)),
+    fractran: (e) => e.t !== "aplica" || (e.vars.f === e.f + 1 && e.testes === e.f + 1),
     sequencial: (e) => (e.t !== "compara" || (e.vars.i === e.i + 1 && e.vars["v[i]"] === v[e.i])) && (e.t !== "achou" || e.vars.achou === e.i + 1),
     binaria: (e) => (e.t !== "compara" || (e.vars.m === e.i + 1 && e.vars["v[m]"] === v[e.i])) && (e.t !== "meio" || e.vars.m === e.m + 1)
       && (e.t !== "corta" || (e.vars.a === e.a + 1 && e.vars.b === e.b + 1)) && (e.t !== "achou" || e.vars.achou === e.i + 1),
@@ -144,7 +145,7 @@ function confereVars(pasta, vetor, eventos) {
   return erros === 0;
 }
 
-for (const pasta of ["bolha", "insercao", "selecao", "intercalacao", "rapida", "heapsort"]) {
+for (const pasta of ["bolha", "insercao", "selecao", "intercalacao", "rapida", "heapsort", "fractran"]) {
   const d = ler(`algoritmos/${pasta}/dados.json`);
   const casos = [{ nome: "vídeo", vetor: d.exemplo.vetor, comparacoes: d.exemplo.ops, movimentos: d.exemplo.movimentos, pico: d.memoria.pico },
     ...d.conferir.map((c, i) => ({ nome: `conferir ${i + 1}`, ...c }))];
