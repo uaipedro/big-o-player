@@ -334,6 +334,7 @@
     grafo: { entrada: "vértices", conta: (ex) => `${ex.n} vértices e ${ex.arestas.length} arestas, ${nomeEstrutura(ex)} de até ${ex.estrutura}, no grafo do encarte` },
     mediana: { entrada: "números", conta: (ex) => `${ex.n} volumes, mediana ${num(ex.mediana, 1)} (a média é ${num(ex.media, 1)}), na entrada do encarte` },
     welford: { entrada: "valores", conta: (ex) => `${ex.n} anos lidos uma vez, variância de ${num(ex.variancia, 4)} pés², na entrada do encarte` },
+    fractran: { entrada: "números", conta: (ex) => `${ex.n} números, ${ex.movimentos} passos, na entrada do encarte`, alem: (ex) => `no programa e em N, com ${ex.n} números` },
     figs: { entrada: "carros", conta: (ex) => `${ex.n} carros, ${ex.divisoes} divisões em ${ex.arvores.length} árvores, ${ex.acertos} certos; a árvore única, com as mesmas ${ex.s}, para em ${ex.uma.divisoes} e acerta ${ex.uma.acertos}` },
     histograma: { entrada: "valores", conta: (ex) => `${ex.n} erupções em ${ex.c} classes de ${num(ex.h, 1)} min, na entrada do encarte` },
     palavras: { entrada: "palavras", artigo: "das", conta: (ex) => `${ex.n} palavras, ${ex.d} distintas, numa tabela que terminou com ${ex.m} casas, na Canção do Exílio` },
@@ -607,6 +608,9 @@
   // o menu de entrada de cada tipo de faixa: rótulo, opções, tamanhos e o botão de sorteio
   const ENTRADAS = {
     ordenacao: { rotulo: "entrada", ns: [8, 16, 24, 32, 48, 64], sortear: "embaralhar", sorteado: "aleatorio",
+      opcoes: [["padrao", "a do encarte", "a entrada do encarte"], ["aleatorio", "aleatória", "entrada aleatória"], ["ordenado", "já ordenada", "entrada já ordenada"], ["invertido", "invertida", "entrada invertida"]] },
+    // a lista inteira de frações fica à vista, e são 4n: o n para em 10
+    fractran: { rotulo: "entrada", ns: [4, 5, 6, 8, 10], sortear: "embaralhar", sorteado: "aleatorio",
       opcoes: [["padrao", "a do encarte", "a entrada do encarte"], ["aleatorio", "aleatória", "entrada aleatória"], ["ordenado", "já ordenada", "entrada já ordenada"], ["invertido", "invertida", "entrada invertida"]] },
     busca: { rotulo: "alvo", ns: [8, 16, 24, 32, 48, 64], sortear: "sortear", sorteado: "sorteado",
       opcoes: [["padrao", "o do encarte", "o alvo do encarte"], ["sorteado", "sorteado", "alvo sorteado"], ["comeco", "no começo", "alvo no começo"], ["fim", "no fim", "alvo no fim"], ["ausente", "ausente", "alvo ausente"]] },
@@ -1093,7 +1097,7 @@
       const E = ENTRADAS[tipoDe(faixa)], atual = cfgs[faixa.id].tipo;
       // ordenações: embaralhar é sempre "aleatória"; nas outras, sorteia de novo o caso escolhido
       // casos sem sorteio (a grade cheia e o caminho dos grafos) também vão para o sorteado
-      const tipo = tipoDe(faixa) === "ordenacao" || atual === "padrao" || (E.fixos || []).includes(atual) ? E.sorteado : atual;
+      const tipo = tipoDe(faixa) === "ordenacao" || tipoDe(faixa) === "fractran" || atual === "padrao" || (E.fixos || []).includes(atual) ? E.sorteado : atual;
       mudarCfg({ tipo, n: Number($("#cfg-n").value), semente: novaSemente() });
     }
   });

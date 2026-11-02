@@ -19,7 +19,7 @@
   const MONO = '"IBM Plex Mono", ui-monospace, monospace';
   const PASSOS_POR_SEGUNDO = 6;                          // ritmo constante, a 1×
   const RITMO = { ordenacao: 15, kmeans: 30, busca: 4, parenteses: 4, atendimento: 6, inverter: 4, janela: 6, grafo: 6, mediana: 15, welford: 8, histograma: 20, palavras: 8, repetidos: 6, colisao: 5,
-    percursos: 6, abb: 8, avl: 8, figs: 12,
+    percursos: 6, abb: 8, avl: 8, figs: 12, fractran: 12,
     matrizes: 8, fatorial: 4, fibonacci: 10, padrao: 8 };          // accelerando: unidades por segundo a 1×
   const CALMO = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;   // sem deslizar
 
@@ -2837,6 +2837,137 @@
     };
   }
 
+  // ---------- Fractran sort ----------
+
+  function simFractran(faixa, vetor, accelerando) {
+    const r = Algoritmos.ordenar("fractran", vetor), n = vetor.length, ideia = faixa.video.ideia;
+    const { nomes, primos, F, casa, inicio } = Algoritmos.fractranPrograma(n);
+    const reg = (nome) => casa[nome];
+    const produto = (lista) => lista.reduce((x, i) => x * BigInt(primos[i]), 1n);
+    const FB = F.map((f) => ({ num: produto(f.num), den: produto(f.den) }));
+
+    // o estado depois de cada evento: os expoentes e o N de verdade, que tem de dividir certinho
+    const e = inicio(vetor);
+    const N0 = e.reduce((x, k, i) => x * BigInt(primos[i]) ** BigInt(k), 1n);
+    let N = N0, comps = 0, passos = 0;
+    const est = r.eventos.map((ev) => {
+      comps += ev.testes;
+      if (ev.t === "aplica") {
+        if (N % FB[ev.f].den !== 0n) throw new Error("reprodução do Fractran não bate");
+        N = N * FB[ev.f].num / FB[ev.f].den;
+        F[ev.f].den.forEach((x) => { e[x]--; });
+        F[ev.f].num.forEach((x) => { e[x]++; });
+        passos++;
+      }
+      return { t: ev.t, linha: ev.linha, vars: ev.vars, nivel: 0, chamada: 0, f: ev.t === "aplica" ? ev.f : null, testes: ev.testes, expo: e.slice(), N: N.toString(), comps, passos };
+    });
+    if (comps !== r.comparacoes || passos !== r.movimentos || r.final.some((x, j) => x !== e[reg(`q${j + 1}`)])) throw new Error("reprodução do Fractran não bate");
+
+    const pesos = !accelerando ? est.map((s) => (s.t === "devolva" ? 3 : 1)) : pesosLentos(est, { aplica: 1, devolva: 6 }, (t) => t === "aplica", 12, 2.5);
+    const tl = linhaDoTempo(pesos);
+    const M = Math.max(1, ...vetor), inicial = { f: null, testes: 0, expo: inicio(vetor), N: N0.toString(), comps: 0, passos: 0, t: "" };
+
+    const CL = 255, PX = 30, QX = 315, BASE = 372, TOPO = 112;
+    const cw = CL / n, d = Math.min(cw * 0.78, (BASE - TOPO - 18) / M);
+    const cx = (x0, i) => x0 + (i + 0.5) * cw;
+    const conta = (ctx, x, k, cor, contorno) => {
+      const y = BASE - (k + 0.5) * d;
+      ctx.beginPath(); ctx.arc(x, y, d * 0.46, 0, 2 * Math.PI);
+      if (contorno) { ctx.strokeStyle = cor; ctx.lineWidth = 1.2; ctx.stroke(); } else { ctx.fillStyle = cor; ctx.fill(); }
+    };
+    const SOBRE = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+    const potencia = (k) => (k === 1 ? "" : String(k).replace(/\d/g, (c) => SOBRE[c]));
+    const corta = (ctx, s, larg) => {
+      ctx.font = `400 12px ${MONO}`;
+      if (ctx.measureText(s).width <= larg) return s;
+      const cabem = Math.floor(larg / ctx.measureText("0").width) - 1;
+      return s.slice(0, cabem) + "…";
+    };
+
+    // a lista de frações: 4n linhas, em três blocos
+    const LX = 610, LX1 = 936, LY0 = 98, LY1 = 492, FOLGA = 6;
+    const lh = (LY1 - LY0 - 2 * FOLGA) / F.length, fonte = Math.min(11, Math.floor(lh * 0.95));
+    const yLinha = (f) => LY0 + f * lh + (F[f].bloco * FOLGA);
+    const nomesDe = (lista) => lista.map((x) => nomes[x]).join(" ");
+
+    function desenhar(ctx, u) {
+      const k = tl.eventoEm(u), fim = u >= tl.total;
+      const s = k >= 0 ? est[k] : inicial;
+      const ex = s.expo;
+
+      // N: o número inteiro e os fatores dele
+      texto(ctx, corta(ctx, `N = ${s.N}`, 900), 30, 56, 12, COR.tinta);
+      const fatores = ex.map((x, i) => [x, i]).filter(([x]) => x > 0).map(([x, i]) => nomes[i] + potencia(x)).join(" · ");
+      texto(ctx, corta(ctx, `  = ${fatores}`, 900), 30, 74, 12, COR.cinza);
+
+      // as colunas de contas: entrada e saída
+      texto(ctx, "entrada", PX, 96, 12, COR.cinza);
+      texto(ctx, "saída", QX, 96, 12, COR.cinza);
+      linha(ctx, PX, BASE + 1, PX + CL, BASE + 1, COR.palido);
+      linha(ctx, QX, BASE + 1, QX + CL, BASE + 1, COR.palido);
+      const ganhou = s.f !== null ? F[s.f].num : [], perdeu = s.f !== null ? F[s.f].den : [];
+      for (let i = 0; i < n; i++) {
+        const ip = reg(`p${i + 1}`), iq = reg(`q${i + 1}`), xp = cx(PX, i), xq = cx(QX, i);
+        for (let c = 0; c < ex[ip]; c++) conta(ctx, xp, c, COR.tinta);
+        if (perdeu.includes(ip)) conta(ctx, xp, ex[ip], COR.mexeu, true);
+        for (let c = 0; c < ex[iq]; c++) conta(ctx, xq, c, fim ? COR.verde : ganhou.includes(iq) && c === ex[iq] - 1 ? COR.mexeu : COR.tinta);
+        texto(ctx, String(ex[ip]), xp, BASE - ex[ip] * d - 15, 11, COR.cinza, 400, "center");
+        texto(ctx, String(ex[iq]), xq, BASE - ex[iq] * d - 15, 11, fim ? COR.verde : COR.cinza, fim ? 600 : 400, "center");
+        texto(ctx, nomes[ip], xp, BASE + 6, 11, COR.tinta, 400, "center");
+        texto(ctx, nomes[iq], xq, BASE + 6, 11, COR.tinta, 400, "center");
+        texto(ctx, String(primos[ip]), xp, BASE + 20, 9, COR.cinza, 400, "center");
+        texto(ctx, String(primos[iq]), xq, BASE + 20, 9, COR.cinza, 400, "center");
+      }
+
+      // as setas: s, a coluna da entrada que está sendo lida; m, a coluna da saída que recebe a próxima conta
+      const si = Array.from({ length: n + 1 }, (_, i) => i).find((i) => ex[reg(`s${i + 1}`)] > 0);
+      const mr = Array.from({ length: n + 1 }, (_, r0) => r0).find((r0) => ex[reg(`m${r0}`)] > 0);
+      const YS = BASE + 34;
+      if (!fim) {
+        const xs = PX + (si + 0.5) * cw;
+        seta(ctx, xs, YS);
+        texto(ctx, nomes[reg(`s${si + 1}`)], xs, YS + 10, 11, COR.tinta, 600, "center");
+        const xm = QX + (mr - 0.5) * cw;
+        seta(ctx, xm, YS);
+        texto(ctx, nomes[reg(`m${mr}`)], xm, YS + 10, 11, COR.tinta, 600, "center");
+      }
+      // τ: a conta a caminho
+      if (ex[casa.t] > 0) {
+        ctx.beginPath(); ctx.arc(300, 240, Math.min(d * 0.46, 10), 0, 2 * Math.PI); ctx.fillStyle = COR.mexeu; ctx.fill();
+        texto(ctx, "τ", 300, 254, 12, COR.mexeu, 600, "center");
+      }
+
+      // as frações
+      F.forEach((fr, f) => {
+        const y = yLinha(f), disparou = s.f === f && !fim, testada = s.testes > f && !disparou;
+        if (disparou || testada) { ctx.fillStyle = disparou ? COR.album : COR.claro; ctx.fillRect(LX, y, LX1 - LX, lh - 0.5); }
+        const cor = disparou ? "#fff" : COR.tinta, ty = y + (lh - fonte) / 2 - 0.5;
+        texto(ctx, String(f + 1), LX + 22, ty, fonte, disparou ? "#fff" : COR.cinza, 400, "right");
+        texto(ctx, nomesDe(fr.num), LX + 150, ty, fonte, cor, disparou ? 600 : 400, "right");
+        texto(ctx, "/", LX + 162, ty, fonte, disparou ? "#fff" : COR.cinza, 400, "center");
+        texto(ctx, nomesDe(fr.den), LX + 174, ty, fonte, cor, disparou ? 600 : 400);
+      });
+
+      // as contas
+      texto(ctx, "frações testadas", PX, 442, 13, COR.cinza);
+      texto(ctx, String(s.comps), PX, 458, 30, fim ? COR.verde : COR.tinta, 700);
+      texto(ctx, "passos", QX, 442, 13, COR.cinza);
+      texto(ctx, String(s.passos), QX, 458, 30, COR.tinta, 700);
+      legendaCores(ctx, [[COR.claro, "testada: não deu inteiro"], [COR.album, "a primeira que deu: vezes N"], [COR.mexeu, "a conta que andou"], [COR.verde, "em ordem"]], 510);
+
+      if (fim) legenda(ctx, [["em ordem: ", ""], [`${r.comparacoes} frações testadas`, "g"], [`, ${r.movimentos} passos`, ""]]);
+      else legenda(ctx, [[ideia[s.passos < 2 * n ? 0 : 1], ""]]);
+    }
+
+    const contagemEm = (u) => { const k = tl.eventoEm(u); return k >= 0 ? est[k].comps : 0; };
+    return {
+      total: tl.total, desenhar, ...comum(tl, est, pesos, RITMO.fractran, accelerando),
+      resumo: { ops: r.comparacoes, passos: r.movimentos, pico: r.pico, n }, contagemEm,
+      medidor: () => `${r.comparacoes} frações testadas, n = ${n}<br>${r.movimentos} passos, ${F.length} frações no programa`,
+      aoVivo: (u, cfg) => `Tocando agora: n = ${n}, ${cfg.rotulo}; ${contagemEm(u)} de ${r.comparacoes} frações testadas, ${r.movimentos} passos, com ${F.length} frações no programa.`,
+    };
+  }
+
   function criar(faixa, cfg, accelerando = false) {
     const tipo = faixa.medido.tempo.tipo, ex = faixa.exemplo, padrao = cfg.tipo === "padrao";
     if (tipo === "busca") {
@@ -2871,6 +3002,7 @@
       const d = { padrao: 0, d6: 1e6, d8: 1e8, d9: 1e9 }[cfg.tipo];
       return simWelford(faixa, ex.x.map((v) => v + d), ex.anos, ex.menu.find((m) => m.deslocamento === d), accelerando);
     }
+    if (tipo === "fractran") return simFractran(faixa, padrao ? ex.vetor : Algoritmos.entrada(cfg.n, cfg.tipo, cfg.semente), accelerando);
     if (tipo === "figs") return simFigs(faixa, ex.X, ex.y, cfg.k || ex.s, cfg.tipo === "uma" ? 1 : null, accelerando);
     if (tipo === "histograma") return simHistograma(faixa, padrao ? ex.x : Algoritmos.amostra(cfg.n, cfg.tipo, cfg.semente), accelerando);
     if (tipo === "palavras") return simPalavras(faixa, padrao ? ex.palavras : ex.palavras.slice(0, cfg.n), accelerando);

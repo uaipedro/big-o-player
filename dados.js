@@ -9655,6 +9655,664 @@ window.GALERIA = [
    "porque": "Cada for, while e if, e cada and/or numa condição, abre um caminho a mais pelo código. A complexidade ciclomática conta os caminhos independentes: qualquer percurso pela função é uma combinação deles. É um teto para quantos testes cobrem todos os ramos, não o mínimo.",
    "regra": "Regra de contagem: +1 por for, while, if, if-expressão, except e cada and/or. Compreensões de lista são proibidas na função medida, porque escondem um laço que o grafo não veria."
   },
+  "alg": "fractran",
+  "id": "fractran-sort",
+  "nome": "Fractran sort",
+  "objetivo": "Pôr o vetor em ordem sem comparar ninguém: o programa é uma lista de frações, e toda a memória cabe num número só.",
+  "variante": "ábaco de 4n frações (Pointer-Abacus), para inteiros não negativos",
+  "familia": "ordenação",
+  "resumo": "Cada número do vetor vira expoente de um primo, e tudo fica guardado em N. O programa só sabe uma coisa: achar a primeira fração que, vezes N, dá inteiro, e multiplicar. A seta s passa pelas colunas de p e tira uma conta de cada uma que tem. Cada conta tirada cai em q, onde a seta m aponta, da direita pra esquerda. Camada por camada, q sai em ordem.",
+  "instrumentos": [
+   {
+    "id": "vetor",
+    "papel": "a entrada e a saída; lá dentro, cada posição vira o expoente de um primo em N"
+   }
+  ],
+  "tempo": {
+   "notacao": "O(n²·M)",
+   "porque": "M é o maior número do vetor. São M + 1 camadas, cada uma com n + 1 passos e mais um passo por conta movida: (M + 1)(n + 1) + soma − 1 passos ao todo. E cada passo testa as frações do começo da lista até achar a que serve, entre 4n. Nos vetores de 0 a n − 1, M cresce junto com n, e a conta vira n³.",
+   "nota": "A ordem da entrada não muda nada: embaralhado, ordenado ou invertido, dá a mesma conta, até a última fração. Quem manda é o tamanho dos números. Só funciona com inteiro não negativo, e as contas não têm dono: sai a lista em ordem, sem dizer quem estava em cada lugar."
+  },
+  "memoria": {
+   "notacao": "O(n)",
+   "porque": "As 4n frações do programa e 4n + 3 expoentes. Na conta de verdade, os expoentes moram todos em N, que é um número só: as casas não aumentam, mas N ganha dígitos conforme os números do vetor crescem.",
+   "nomes": {
+    "expoentes": "expoentes dos primos de N",
+    "programa": "frações do programa"
+   },
+   "cresce_com_n": [
+    "expoentes",
+    "programa"
+   ]
+  },
+  "video": {
+   "ideia": [
+    "cada passo multiplica N pela primeira fração que dá inteiro",
+    "a cada camada, uma conta de cada p cai em q, da direita pra esquerda"
+   ]
+  },
+  "graficos": {
+   "titulo": "Tempo: o que cresce, e o que não faz diferença",
+   "texto": "As mesmas contas para vetores cada vez maiores e para números cada vez maiores. A ordem da entrada fica de fora: as três linhas caem uma em cima da outra.",
+   "crescimento": "Frações testadas para n de {n0} a {n1}, com números de 0 a n − 1. {dados}. Dobrou o n, testa quase 8 vezes mais: é o n³.",
+   "por_k": "Frações testadas para o maior número M de {k0} a {k1}, com n = {nk}. Sorteio de números de 0 a M, com M garantido no vetor. Em escala logarítmica, o reto no fim é o custo subindo junto com M."
+  },
+  "placa": {
+   "autor": "Rei Silva, com o Gemini (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
+   "ano": "2026; FRACTRAN em 1987, bead sort em 2002"
+  },
+  "poster": "algoritmos/fractran/fractran.png",
+  "exemplo": {
+   "dados": "8 números (de 0 a 7) embaralhados com a semente 11",
+   "n": 8,
+   "semente": 11,
+   "vetor": [
+    1,
+    0,
+    2,
+    5,
+    3,
+    4,
+    6,
+    7
+   ],
+   "ops": 1379,
+   "movimentos": 99,
+   "movimento": "passos"
+  },
+  "medido": {
+   "tempo": {
+    "unidade": "frações testadas",
+    "tipo": "fractran",
+    "crescimento": [
+     {
+      "n": 4,
+      "aleatorio": {
+       "media": 209,
+       "min": 209,
+       "max": 209,
+       "movimentos": 25,
+       "pico": 35
+      },
+      "ordenado": {
+       "media": 209,
+       "pico": 35
+      },
+      "invertido": {
+       "media": 209,
+       "pico": 35
+      }
+     },
+     {
+      "n": 8,
+      "aleatorio": {
+       "media": 1379,
+       "min": 1379,
+       "max": 1379,
+       "movimentos": 99,
+       "pico": 67
+      },
+      "ordenado": {
+       "media": 1379,
+       "pico": 67
+      },
+      "invertido": {
+       "media": 1379,
+       "pico": 67
+      }
+     },
+     {
+      "n": 16,
+      "aleatorio": {
+       "media": 9927,
+       "min": 9927,
+       "max": 9927,
+       "movimentos": 391,
+       "pico": 131
+      },
+      "ordenado": {
+       "media": 9927,
+       "pico": 131
+      },
+      "invertido": {
+       "media": 9927,
+       "pico": 131
+      }
+     },
+     {
+      "n": 32,
+      "aleatorio": {
+       "media": 75151,
+       "min": 75151,
+       "max": 75151,
+       "movimentos": 1551,
+       "pico": 259
+      },
+      "ordenado": {
+       "media": 75151,
+       "pico": 259
+      },
+      "invertido": {
+       "media": 75151,
+       "pico": 259
+      }
+     },
+     {
+      "n": 64,
+      "aleatorio": {
+       "media": 584479,
+       "min": 584479,
+       "max": 584479,
+       "movimentos": 6175,
+       "pico": 515
+      },
+      "ordenado": {
+       "media": 584479,
+       "pico": 515
+      },
+      "invertido": {
+       "media": 584479,
+       "pico": 515
+      }
+     }
+    ],
+    "crescimento_dados": "Aleatório: média de 10 vetores embaralhados por tamanho; ordenado e invertido: um vetor cada",
+    "eixo": "n (números; dobra a cada passo)",
+    "refs": [],
+    "banda": "aleatorio",
+    "series": [
+     {
+      "caso": "aleatorio",
+      "nome": "embaralhado (média)"
+     },
+     {
+      "caso": "ordenado",
+      "nome": "já ordenado"
+     },
+     {
+      "caso": "invertido",
+      "nome": "invertido"
+     }
+    ],
+    "por_k": [
+     {
+      "n": 1,
+      "aleatorio": {
+       "media": 1205.9,
+       "min": 1194,
+       "max": 1220,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 1220,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 1220,
+       "pico": 0
+      }
+     },
+     {
+      "n": 2,
+      "aleatorio": {
+       "media": 1822.7,
+       "min": 1794,
+       "max": 1842,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 1822,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 1822,
+       "pico": 0
+      }
+     },
+     {
+      "n": 4,
+      "aleatorio": {
+       "media": 3075.1,
+       "min": 3030,
+       "max": 3126,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 3097,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 3097,
+       "pico": 0
+      }
+     },
+     {
+      "n": 8,
+      "aleatorio": {
+       "media": 5585.9,
+       "min": 5485,
+       "max": 5675,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 5589,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 5589,
+       "pico": 0
+      }
+     },
+     {
+      "n": 16,
+      "aleatorio": {
+       "media": 10587.2,
+       "min": 10398,
+       "max": 10741,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 10615,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 10615,
+       "pico": 0
+      }
+     },
+     {
+      "n": 32,
+      "aleatorio": {
+       "media": 20581.5,
+       "min": 20260,
+       "max": 20950,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 20667,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 20667,
+       "pico": 0
+      }
+     },
+     {
+      "n": 64,
+      "aleatorio": {
+       "media": 40602.4,
+       "min": 39979,
+       "max": 41374,
+       "pico": 0
+      },
+      "ordenado": {
+       "media": 40792,
+       "pico": 0
+      },
+      "invertido": {
+       "media": 40792,
+       "pico": 0
+      }
+     }
+    ],
+    "k_fixo": 64,
+    "n_fixo": 16,
+    "eixo_k": "M, o maior número (n = 16)"
+   },
+   "memoria": {
+    "pico": 67,
+    "detalhe": {
+     "programa": 32,
+     "expoentes": 35
+    }
+   },
+   "ciclomatica": {
+    "M": 4,
+    "nos": 19,
+    "arestas": 21,
+    "decisoes": [
+     {
+      "linha": 8,
+      "tipo": "while"
+     },
+     {
+      "linha": 10,
+      "tipo": "for"
+     },
+     {
+      "linha": 12,
+      "tipo": "if"
+     }
+    ],
+    "grafo": {
+     "nos": [
+      {
+       "id": 0,
+       "linha": 1,
+       "rotulo": "início"
+      },
+      {
+       "id": 1,
+       "linha": 2,
+       "rotulo": "assign"
+      },
+      {
+       "id": 2,
+       "linha": 3,
+       "rotulo": "assign"
+      },
+      {
+       "id": 3,
+       "linha": 4,
+       "rotulo": "assign"
+      },
+      {
+       "id": 4,
+       "linha": 5,
+       "rotulo": "expr"
+      },
+      {
+       "id": 5,
+       "linha": 6,
+       "rotulo": "expr"
+      },
+      {
+       "id": 6,
+       "linha": 7,
+       "rotulo": "assign"
+      },
+      {
+       "id": 7,
+       "linha": 8,
+       "rotulo": "while"
+      },
+      {
+       "id": 8,
+       "linha": 9,
+       "rotulo": "assign"
+      },
+      {
+       "id": 9,
+       "linha": 10,
+       "rotulo": "for"
+      },
+      {
+       "id": 10,
+       "linha": 11,
+       "rotulo": "expr"
+      },
+      {
+       "id": 11,
+       "linha": 12,
+       "rotulo": "if"
+      },
+      {
+       "id": 12,
+       "linha": 13,
+       "rotulo": "expr"
+      },
+      {
+       "id": 13,
+       "linha": 14,
+       "rotulo": "expr"
+      },
+      {
+       "id": 14,
+       "linha": 15,
+       "rotulo": "expr"
+      },
+      {
+       "id": 15,
+       "linha": 16,
+       "rotulo": "assign"
+      },
+      {
+       "id": 16,
+       "linha": 17,
+       "rotulo": "break"
+      },
+      {
+       "id": 17,
+       "linha": 18,
+       "rotulo": "assign"
+      },
+      {
+       "id": 18,
+       "linha": 19,
+       "rotulo": "fim"
+      }
+     ],
+     "arestas": [
+      {
+       "de": 0,
+       "para": 1,
+       "tipo": "segue"
+      },
+      {
+       "de": 1,
+       "para": 2,
+       "tipo": "segue"
+      },
+      {
+       "de": 2,
+       "para": 3,
+       "tipo": "segue"
+      },
+      {
+       "de": 3,
+       "para": 4,
+       "tipo": "segue"
+      },
+      {
+       "de": 4,
+       "para": 5,
+       "tipo": "segue"
+      },
+      {
+       "de": 5,
+       "para": 6,
+       "tipo": "segue"
+      },
+      {
+       "de": 6,
+       "para": 7,
+       "tipo": "segue"
+      },
+      {
+       "de": 7,
+       "para": 8,
+       "tipo": "segue"
+      },
+      {
+       "de": 8,
+       "para": 9,
+       "tipo": "segue"
+      },
+      {
+       "de": 9,
+       "para": 10,
+       "tipo": "segue"
+      },
+      {
+       "de": 10,
+       "para": 11,
+       "tipo": "segue"
+      },
+      {
+       "de": 11,
+       "para": 12,
+       "tipo": "segue"
+      },
+      {
+       "de": 12,
+       "para": 13,
+       "tipo": "segue"
+      },
+      {
+       "de": 13,
+       "para": 14,
+       "tipo": "segue"
+      },
+      {
+       "de": 14,
+       "para": 15,
+       "tipo": "segue"
+      },
+      {
+       "de": 15,
+       "para": 16,
+       "tipo": "segue"
+      },
+      {
+       "de": 11,
+       "para": 9,
+       "tipo": "volta"
+      },
+      {
+       "de": 9,
+       "para": 7,
+       "tipo": "volta"
+      },
+      {
+       "de": 16,
+       "para": 7,
+       "tipo": "volta"
+      },
+      {
+       "de": 7,
+       "para": 17,
+       "tipo": "segue"
+      },
+      {
+       "de": 17,
+       "para": 18,
+       "tipo": "segue"
+      }
+     ]
+    },
+    "codigo": "def fractran(v, conta):\n    n = len(v)\n    F = programa(n)\n    expo = entrada(v)\n    conta.ocupa(\"programa\", len(F))\n    conta.ocupa(\"expoentes\", len(expo))\n    achou = True\n    while achou:\n        achou = False\n        for f in range(len(F)):\n            conta.op(\"comparacoes\")\n            if divide(expo, F[f][1]):\n                aplica(expo, F[f])\n                conta.op(MOVIMENTO)\n                conta.evento(\"aplica\", f)\n                achou = True\n                break\n    v[:] = expo[n:2 * n]\n"
+   }
+  },
+  "conferencia": {
+   "referencia": "fractran_r() (reimplementação em R) e sort()",
+   "versao_r": "4.6.0",
+   "vetores": 15,
+   "tudo_ok": true,
+   "resumo": "Reescrito em R 4.6.0 e rodado em 15 vetores (de 1 a 24 números, com repetidos e zeros): a ordem final bate com sort(), as frações testadas e os passos batem um a um com o Python, e os passos batem com (M + 1)(n + 1) + soma − 1."
+  },
+  "pseudocodigo": {
+   "assinatura": "fractran_sort(v)",
+   "nome": "fractran_sort",
+   "arvore": [
+    {
+     "tipo": "acao",
+     "linha": 2,
+     "texto": "F ← as 4n frações, na ordem",
+     "chamada": false
+    },
+    {
+     "tipo": "acao",
+     "linha": 3,
+     "texto": "N ← s₁ · mₙ · p₁^v[1] · p₂^v[2] · … · pₙ^v[n]",
+     "chamada": false
+    },
+    {
+     "tipo": "acao",
+     "linha": 4,
+     "texto": "achou ← verdadeiro",
+     "chamada": false
+    },
+    {
+     "tipo": "laco",
+     "rotulo": "enquanto",
+     "linha": 5,
+     "op": "e",
+     "conds": [
+      "achou"
+     ],
+     "corpo": [
+      {
+       "tipo": "acao",
+       "linha": 6,
+       "texto": "achou ← falso",
+       "chamada": false
+      },
+      {
+       "tipo": "laco",
+       "rotulo": "para",
+       "linha": 7,
+       "op": "e",
+       "conds": [
+        "para f de 1 até 4n"
+       ],
+       "corpo": [
+        {
+         "tipo": "se",
+         "linha": 8,
+         "op": "e",
+         "conds": [
+          "F[f].den divide N"
+         ],
+         "entao": [
+          {
+           "tipo": "acao",
+           "linha": 9,
+           "texto": "N ← N · F[f].num / F[f].den",
+           "chamada": false
+          },
+          {
+           "tipo": "acao",
+           "linha": 10,
+           "texto": "achou ← verdadeiro",
+           "chamada": false
+          },
+          {
+           "tipo": "pare",
+           "linha": 11
+          }
+         ],
+         "senao": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "tipo": "acao",
+     "linha": 12,
+     "texto": "v ← os expoentes de q₁, q₂, …, qₙ",
+     "chamada": false
+    }
+   ],
+   "linhas": [
+    "procedimento fractran_sort(v):",
+    "    F ← as 4n frações, na ordem",
+    "    N ← s₁ · mₙ · p₁^v[1] · p₂^v[2] · … · pₙ^v[n]",
+    "    achou ← verdadeiro",
+    "    enquanto achou:",
+    "        achou ← falso",
+    "        para f de 1 até 4n:",
+    "            se F[f].den divide N:",
+    "                N ← N · F[f].num / F[f].den",
+    "                achou ← verdadeiro",
+    "                pare",
+    "    v ← os expoentes de q₁, q₂, …, qₙ"
+   ],
+   "M": 4,
+   "nos": 13,
+   "arestas": 15,
+   "decisoes": [
+    5,
+    7,
+    8
+   ]
+  }
+ },
+ {
+  "ciclomatica": {
+   "porque": "Cada for, while e if, e cada and/or numa condição, abre um caminho a mais pelo código. A complexidade ciclomática conta os caminhos independentes: qualquer percurso pela função é uma combinação deles. É um teto para quantos testes cobrem todos os ramos, não o mínimo.",
+   "regra": "Regra de contagem: +1 por for, while, if, if-expressão, except e cada and/or. Compreensões de lista são proibidas na função medida, porque escondem um laço que o grafo não veria."
+  },
   "alg": "parenteses",
   "id": "parenteses-balanceados",
   "nome": "Parênteses balanceados",
@@ -27997,7 +28655,7 @@ window.PLAYLISTS = [
   "titulo": "Ordenar uma lista",
   "cor": "vermelho",
   "codigo": "OL",
-  "frase": "Pôr números em ordem. Na sequência, a playlist vai do O(n²) ao O(n log n).",
+  "frase": "Pôr números em ordem. Na sequência, a playlist vai do O(n²) ao O(n log n), e fecha com um jeito que nem compara: só frações.",
   "subcategorias": [
    {
     "titulo": "um por um, O(n²)",
@@ -28018,6 +28676,12 @@ window.PLAYLISTS = [
     "titulo": "com um heap",
     "faixas": [
      "heapsort"
+    ]
+   },
+   {
+    "titulo": "só com frações, sem comparar",
+    "faixas": [
+     "fractran"
     ]
    }
   ]
