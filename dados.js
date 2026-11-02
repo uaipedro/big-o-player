@@ -9698,7 +9698,7 @@ window.GALERIA = [
    "por_k": "Frações testadas para o maior número M de {k0} a {k1}, com n = {nk}. Sorteio de números de 0 a M, com M garantido no vetor. Em escala logarítmica, o reto no fim é o custo subindo junto com M."
   },
   "placa": {
-   "autor": "Rei Silva, com o Gemini (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
+   "autor": "Rei Silva (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
    "ano": "2026; FRACTRAN em 1987, bead sort em 2002"
   },
   "poster": "algoritmos/fractran/fractran.png",

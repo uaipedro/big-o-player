@@ -42,7 +42,7 @@
  },
  "pseudocodigo": "procedimento fractran_sort(v):\n    F ← as 4n frações, na ordem\n    N ← s₁ · mₙ · p₁^v[1] · p₂^v[2] · … · pₙ^v[n]\n    achou ← verdadeiro\n    enquanto achou:\n        achou ← falso\n        para f de 1 até 4n:\n            se F[f].den divide N:\n                N ← N · F[f].num / F[f].den\n                achou ← verdadeiro\n                pare\n    v ← os expoentes de q₁, q₂, …, qₙ\n",
  "placa": {
-  "autor": "Rei Silva, com o Gemini (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
+  "autor": "Rei Silva (rascunho sem revisão por pares); FRACTRAN é de John H. Conway; as camadas vêm do bead sort de Arulanandham, Calude e Dinneen",
   "ano": "2026; FRACTRAN em 1987, bead sort em 2002"
  }
 }
